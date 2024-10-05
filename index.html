@@ -165,23 +165,18 @@
         // Function to show the histogram of quiz results
         function showHistogram() {
             const histogramContainer = document.getElementById('histogram');
-            histogramContainer.innerHTML = ''; // Clear previous histogram
-            const maxAttempts = Math.max(...quizAttempts, 1); // Get the max attempts for scaling
+            const bar = document.createElement('div');
+            const barWidth = (correctAnswersCount / 5) * 100; // Calculate width as a percentage of 5
+            bar.className = 'bar';
+            bar.style.width = `${barWidth}%`; // Set the width of the bar
+            bar.innerText = `Attempt ${quizAttempts.length}: ${correctAnswersCount}`; // Set the text inside the bar
 
-            quizAttempts.forEach((score, index) => {
-                const bar = document.createElement('div');
-                const barWidth = (score / maxAttempts) * 100; // Calculate width as a percentage
-                bar.className = 'bar';
-                bar.style.width = `${barWidth}%`; // Set the width of the bar
-                bar.innerText = `Attempt ${index + 1}: ${score}`; // Set the text inside the bar
+            const label = document.createElement('div');
+            label.className = 'label';
+            label.innerText = `Attempt ${quizAttempts.length}`; // Label for the bar
 
-                const label = document.createElement('div');
-                label.className = 'label';
-                label.innerText = `Attempt ${index + 1}`; // Label for the bar
-
-                histogramContainer.appendChild(bar); // Add bar to the histogram
-                histogramContainer.appendChild(label); // Add label below the bar
-            });
+            histogramContainer.appendChild(bar); // Add bar to the histogram
+            histogramContainer.appendChild(label); // Add label below the bar
         }
     </script>
 </body>
