@@ -54,47 +54,17 @@
         #quiz-container {
             display: none;
         }
-        #histogram {
+        #result-container {
             margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-        }
-        .attempt {
+            display: none;
             text-align: center;
-            margin: 10px;
         }
-        .circular-chart {
-            display: inline-block;
-            max-width: 100px;
-            max-height: 100px;
+        #progress {
+            text-align: center;
         }
-        .circle {
-            fill: none;
-            stroke-width: 3.8;
-            stroke-linecap: round;
-            animation: progress-animation 1s ease-out forwards;
-        }
-        .circle-background {
-            stroke: #e6e6e6;
-        }
-        .circle-correct {
-            stroke: #007bff;
-        }
-        .circle-total {
-            stroke: #4caf50;
-        }
-        @keyframes progress-animation {
-            from {
-                stroke-dasharray: 0 100;
-            }
-            to {
-                stroke-dasharray: var(--progress-value) 100;
-            }
-        }
-        .attempt-label {
-            margin-top: 5px;
-            font-size: 1em;
+        canvas {
+            margin-top: 20px;
+            max-width: 100%;
         }
     </style>
 </head>
@@ -124,17 +94,19 @@
             <p id="progress"></p>
         </div>
 
-        <div id="result-container" style="display:none;">
+        <div id="result-container">
             <p class="result" id="result"></p>
-            <div id="histogram"></div>
+            <canvas id="evolutionChart"></canvas>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let currentQuestionIndex = 0;
         let correctAnswersCount = 0;
         let questions = [];
-        let quizAttempts = [];
+        let quizAttempts = []; // Store the number of correct answers for each attempt
+        let chart; // Global chart variable
 
         function startQuiz() {
             const questionCount = document.getElementById('question-count').value;
@@ -177,48 +149,44 @@
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('result-container').style.display = 'block';
             document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct!`;
-            quizAttempts.push({ correct: correctAnswersCount, total: questions.length });
-            showHistogram();
+
+            quizAttempts.push(correctAnswersCount / questions.length * 100); // Store the percentage of correct answers
+
+            updateChart(); // Update the line chart to show the evolution
         }
 
-        function showHistogram() {
-            const histogramContainer = document.getElementById('histogram');
-            histogramContainer.innerHTML = ''; // Clear previous data
-
-            quizAttempts.forEach((attempt, index) => {
-                const attemptDiv = document.createElement('div');
-                attemptDiv.className = 'attempt';
-
-                // Create the circular chart
-                const circularChart = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                circularChart.setAttribute('class', 'circular-chart');
-                circularChart.setAttribute('viewBox', '0 0 36 36');
-
-                // Background circle
-                const backgroundCircle = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                backgroundCircle.setAttribute('class', 'circle circle-background');
-                backgroundCircle.setAttribute('d', 'M18 2.0845a 15.9155 15.9155 0 1 1 0 31.831 a 15.9155 15.9155 0 1 1 0 -31.831');
-                circularChart.appendChild(backgroundCircle);
-
-                // Correct answers circle
-                const correctCircle = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                correctCircle.setAttribute('class', 'circle circle-correct');
-                correctCircle.setAttribute('d', 'M18 2.0845a 15.9155 15.9155 0 1 1 0 31.831 a 15.9155 15.9155 0 1 1 0 -31.831');
-                correctCircle.style.setProperty('--progress-value', `${(attempt.correct / attempt.total) * 100}`);
-                correctCircle.setAttribute('stroke-dasharray', '0 100');
-                circularChart.appendChild(correctCircle);
-
-                attemptDiv.appendChild(circularChart);
-
-                // Add label
-                const attemptLabel = document.createElement('div');
-                attemptLabel.className = 'attempt-label';
-                attemptLabel.innerText = `Attempt ${index + 1}: ${attempt.correct} / ${attempt.total}`;
-                attemptDiv.appendChild(attemptLabel);
-
-                // Append attempt block to histogram
-                histogramContainer.appendChild(attemptDiv);
-            });
+        function updateChart() {
+            const ctx = document.getElementById('evolutionChart').getContext('2d');
+            const labels = quizAttempts.map((_, index) => `Attempt ${index + 1}`);
+            
+            if (chart) {
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = quizAttempts;
+                chart.update();
+            } else {
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Success Rate (%)',
+                            data: quizAttempts,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                            }
+                        }
+                    }
+                });
+            }
         }
     </script>
 </body>
