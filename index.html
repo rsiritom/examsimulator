@@ -60,12 +60,20 @@
             flex-direction: column;
             align-items: center;
         }
+        .attempt-bars {
+            margin-bottom: 20px;
+        }
         .bar {
             background-color: #007bff;
             margin: 5px 0;
             border-radius: 5px;
-            width: 80%;
             transition: width 0.3s;
+        }
+        .bar.correct {
+            background-color: #007bff;
+        }
+        .bar.total {
+            background-color: #4caf50;
         }
         .label {
             text-align: center;
@@ -159,32 +167,35 @@
 
         function showHistogram() {
             const histogramContainer = document.getElementById('histogram');
-            // Create a bar for correct answers
-            const correctBar = document.createElement('div');
-            const correctBarWidth = (correctAnswersCount / questions.length) * 100; // Calculate width as a percentage of total questions
-            correctBar.className = 'bar';
-            correctBar.style.width = `${correctBarWidth}%`;
-            correctBar.innerText = `Attempt ${quizAttempts.length}: ${correctAnswersCount} correct`;
-            histogramContainer.appendChild(correctBar); 
+            histogramContainer.innerHTML = ''; // Clear previous bars
 
-            const correctLabel = document.createElement('div');
-            correctLabel.className = 'label';
-            correctLabel.innerText = `Attempt ${quizAttempts.length}`;
-            histogramContainer.appendChild(correctLabel);
+            quizAttempts.forEach((attempt, index) => {
+                const attemptBars = document.createElement('div');
+                attemptBars.className = 'attempt-bars';
 
-            // Create a bar for total questions
-            const totalBar = document.createElement('div');
-            const totalBarWidth = (questions.length / 5) * 100; // Scale total questions to a width
-            totalBar.className = 'bar';
-            totalBar.style.backgroundColor = '#4caf50'; // Different color for total questions
-            totalBar.style.width = `${totalBarWidth}%`;
-            totalBar.innerText = `Total Questions: ${questions.length}`;
-            histogramContainer.appendChild(totalBar); 
+                // Bar for correct answers
+                const correctBar = document.createElement('div');
+                correctBar.className = 'bar correct';
+                correctBar.style.width = `${(attempt.correct / attempt.total) * 100}%`;
+                correctBar.innerText = `Attempt ${index + 1}: ${attempt.correct} correct`;
+                attemptBars.appendChild(correctBar);
 
-            const totalLabel = document.createElement('div');
-            totalLabel.className = 'label';
-            totalLabel.innerText = `Total Questions`;
-            histogramContainer.appendChild(totalLabel);
+                // Bar for total questions
+                const totalBar = document.createElement('div');
+                totalBar.className = 'bar total';
+                totalBar.style.width = '100%'; // Total bar always fills the width
+                totalBar.innerText = `Total Questions: ${attempt.total}`;
+                attemptBars.appendChild(totalBar);
+
+                // Add the set of bars to the histogram container
+                histogramContainer.appendChild(attemptBars);
+
+                // Label for each attempt
+                const attemptLabel = document.createElement('div');
+                attemptLabel.className = 'label';
+                attemptLabel.innerText = `Attempt ${index + 1}`;
+                histogramContainer.appendChild(attemptLabel);
+            });
         }
     </script>
 </body>
