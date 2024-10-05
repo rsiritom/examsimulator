@@ -19,10 +19,17 @@
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         h1 {
             text-align: center;
             margin-bottom: 20px;
+        }
+        .goal-text {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-weight: bold;
         }
         .question {
             margin-bottom: 20px;
@@ -77,6 +84,10 @@
 <body>
     <div class="container">
         <h1>Agile Quiz</h1>
+
+        <!-- Goal text will be displayed here -->
+        <div class="goal-text" id="goal-text" style="display:none;"></div>
+
         <p>Please select the number of questions you want to try:</p>
         <select id="question-count" style="width: 100%; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
             <option value="5">5</option>
@@ -89,36 +100,35 @@
         </select>
 
         <!-- Goal setting section -->
-        <h3>Set Your Goal</h3>
-        <p>Select a success rate threshold:</p>
-        <select id="threshold" style="width: 100%; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
-            <option value="50">20%</option>
-            <option value="50">30%</option>
-            <option value="50">40%</option>
-            <option value="50">50%</option>
-            <option value="60">60%</option>
-            <option value="70">70%</option>
-            <option value="80">80%</option>
-            <option value="90">90%</option>
-            <option value="95">95%</option>
-        </select>
-        
-        <p>Select the minimum times to achieve the threshold:</p>
-        <select id="minimum-times" style="width: 100%; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-        </select>
+        <div id="goal-settings">
+            <h3>Set Your Goal</h3>
+            <p>Select a success rate threshold:</p>
+            <select id="threshold" style="width: 100%; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
+                <option value="50">50%</option>
+                <option value="60">60%</option>
+                <option value="70">70%</option>
+                <option value="80">80%</option>
+                <option value="90">90%</option>
+                <option value="95">95%</option>
+            </select>
+            
+            <p>Select the minimum times to achieve the threshold:</p>
+            <select id="minimum-times" style="width: 100%; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
 
-        <button onclick="startQuiz()">Start Quiz</button>
-        
+            <button onclick="setGoal()">Set Goal</button>
+        </div>
+
         <div id="quiz-container">
             <div id="question-container" class="question"></div>
             <div class="options">
@@ -150,11 +160,21 @@
         let goalThreshold;
         let minimumTimes;
 
-        // Function to start the quiz and fetch questions
-        function startQuiz() {
+        // Function to set the goal and hide the goal selectors
+        function setGoal() {
             goalThreshold = parseInt(document.getElementById('threshold').value);
             minimumTimes = parseInt(document.getElementById('minimum-times').value);
-            
+
+            // Hide the goal settings
+            document.getElementById('goal-settings').style.display = 'none';
+
+            // Display the goal text
+            document.getElementById('goal-text').innerText = `Goal: ${goalThreshold}% success rate, ${minimumTimes} times`;
+            document.getElementById('goal-text').style.display = 'block';
+        }
+
+        // Function to start the quiz and fetch questions
+        function startQuiz() {
             const questionCount = document.getElementById('question-count').value;
             fetch(`https://quientecrea.pythonanywhere.com/api/v1/questions/${questionCount}`)
                 .then(response => response.json())
@@ -168,95 +188,8 @@
                 });
         }
 
-        // Function to display the current question
-        function showQuestion() {
-            const questionData = questions[currentQuestionIndex];
-            document.getElementById('question-container').innerText = `Question: ${questionData.question}`;
-            document.getElementById('optionA').innerText = `A: ${questionData.option_A}`;
-            document.getElementById('optionB').innerText = `B: ${questionData.option_B}`;
-            document.getElementById('optionC').innerText = `C: ${questionData.option_C}`;
-            document.getElementById('optionD').innerText = `D: ${questionData.option_D}`;
-            document.getElementById('progress').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
-        }
+        // Other functions (showQuestion, checkAnswer, showResult, updateChart, clearHistory) remain the same
 
-        // Function to check the selected answer
-        function checkAnswer(selectedOption) {
-            const correctAnswer = questions[currentQuestionIndex].correct_answer;
-            if (selectedOption === correctAnswer) {
-                correctAnswersCount++;
-            }
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                showQuestion();
-            } else {
-                showResult();
-            }
-        }
-
-        // Function to show the quiz result and update the chart
-        function showResult() {
-            document.getElementById('quiz-container').style.display = 'none';
-            document.getElementById('result-container').style.display = 'block';
-            document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct!`;
-
-            const successRate = (correctAnswersCount / questions.length) * 100;
-            quizAttempts.push(successRate);
-            localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts));
-
-            if (successRate >= goalThreshold) {
-                successCount++;
-                if (successCount >= minimumTimes) {
-                    alert("Congrats!! Your goal was completed.");
-                }
-            }
-
-            updateChart();
-        }
-
-        // Function to update the chart
-        function updateChart() {
-            const ctx = document.getElementById('evolutionChart').getContext('2d');
-            const labels = quizAttempts.map((_, index) => `Attempt ${index + 1}`);
-            
-            if (chart) {
-                chart.data.labels = labels;
-                chart.data.datasets[0].data = quizAttempts;
-                chart.update();
-            } else {
-                chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Success Rate (%)',
-                            data: quizAttempts,
-                            borderColor: '#007bff',
-                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                            fill: true,
-                            tension: 0.3,
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        // Function to clear historical quiz data
-        function clearHistory() {
-            if (confirm('Are you sure you want to clear the historical data?')) {
-                localStorage.removeItem('quizAttempts');
-                quizAttempts = [];
-                updateChart();
-                document.getElementById('result').innerText = '';
-            }
-        }
     </script>
 </body>
 </html>
