@@ -5,11 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agile Quiz</title>
     <style>
-        /* Existing styles... */
-        button.clear-history {
-            background-color: #dc3545;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
         }
-        button.clear-history:hover {
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .options {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+        }
+        #quiz-container {
+            display: none;
+        }
+        #result-container {
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+        #progress {
+            text-align: center;
+        }
+        canvas {
+            margin-top: 20px;
+            max-width: 100%;
+        }
+        .clear-history {
+            background-color: #dc3545;
+            margin-top: 20px;
+        }
+        .clear-history:hover {
             background-color: #c82333;
         }
     </style>
@@ -17,10 +78,27 @@
 <body>
     <div class="container">
         <h1>Agile Quiz</h1>
-        <!-- Existing HTML code... -->
-
+        <p>Please select the number of questions you want to try:</p>
+        <select id="question-count" style="width: 100%; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="150">150</option>
+            <option value="180">180</option>
+        </select>
+        <button onclick="startQuiz()">Start Quiz</button>
+        
         <div id="quiz-container">
-            <!-- Existing quiz content... -->
+            <div id="question-container" class="question"></div>
+            <div class="options">
+                <button id="optionA" onclick="checkAnswer('A')"></button>
+                <button id="optionB" onclick="checkAnswer('B')"></button>
+                <button id="optionC" onclick="checkAnswer('C')"></button>
+                <button id="optionD" onclick="checkAnswer('D')"></button>
+            </div>
+            <p id="progress"></p>
         </div>
 
         <div id="result-container">
@@ -35,20 +113,30 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Existing script...
+        let currentQuestionIndex = 0;
+        let correctAnswersCount = 0;
+        let questions = [];
+        let quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || []; // Retrieve previous quiz attempts from localStorage
+        let chart; // Global chart variable
 
-        // Function to clear the historical quiz data from localStorage
-        function clearHistory() {
-            if (confirm("Are you sure you want to clear the historical data?")) {
-                localStorage.removeItem('quizAttempts');
-                quizAttempts = []; // Reset the attempts array
-                updateChart(); // Update the chart to show empty data
-                document.getElementById('result-container').style.display = 'none'; // Hide the result container
-                alert("Historical data cleared!");
-            }
+        // Function to start the quiz and fetch questions
+        function startQuiz() {
+            const questionCount = document.getElementById('question-count').value;
+            fetch(`https://quientecrea.pythonanywhere.com/api/v1/questions/${questionCount}`)
+                .then(response => response.json())
+                .then(data => {
+                    questions = data;
+                    currentQuestionIndex = 0;
+                    correctAnswersCount = 0;
+                    document.getElementById('quiz-container').style.display = 'block';
+                    document.getElementById('result-container').style.display = 'none';
+                    showQuestion();
+                });
         }
 
-        // Existing functions...
-    </script>
-</body>
-</html>
+        // Function to display the current question
+        function showQuestion() {
+            const questionData = questions[currentQuestionIndex];
+            document.getElementById('question-container').innerText = `Question: ${questionData.question}`;
+            document.getElementById('optionA').innerText = `A: ${questionData.option_A}`;
+            document.getElementBy
