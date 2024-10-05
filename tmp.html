@@ -294,6 +294,14 @@
                 chart.destroy();
             }
         }
+        // Add this section to initialize the chart on page load
+        window.onload = function() {
+            // Retrieve quiz attempts from localStorage
+            quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
+            
+            // Initialize chart with the retrieved attempts
+            updateChart();
+        };
     </script>
 </body>
 </html>
