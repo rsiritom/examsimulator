@@ -167,11 +167,15 @@
         // Function to show the histogram of quiz results
         function showHistogram() {
             const histogramContainer = document.getElementById('histogram');
-            const bar = document.createElement('div');
-            const barWidth = (correctAnswersCount / 5) * 100; // Calculate width as a percentage of 5
-            bar.className = 'bar';
-            bar.style.width = `${barWidth}%`; // Set the width of the bar
-            histogramContainer.appendChild(bar); // Add bar to the histogram
+            histogramContainer.innerHTML = ''; // Clear previous bars
+            quizAttempts.forEach(attempt => {
+                const bar = document.createElement('div');
+                const barWidth = (attempt / 5) * 100; // Calculate width as a percentage of 5
+                bar.className = 'bar';
+                bar.style.width = `${barWidth}%`; // Set the width of the bar
+                histogramContainer.appendChild(bar); // Add bar to the histogram
+            });
+            console.log(quizAttempts); // Debugging info to check attempts
         }
     </script>
 </body>
