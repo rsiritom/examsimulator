@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agile Quiz</title>
+    <title>PMP Simulator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -84,7 +84,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Agile Quiz</h1>
+        <h1>PMP Simulator</h1>
         
         <div id="goal-container">
             <h2>Set Your Goal</h2>
@@ -166,7 +166,8 @@
         document.getElementById('set-goal-button').onclick = function() {
             threshold = parseInt(document.getElementById('threshold').value);
             minimumTimes = parseInt(document.getElementById('minimum_times').value);
-            document.getElementById('goal-container').style.display = 'none';
+			consecutiveSuccessfulQuizzes = 0
+            //document.getElementById('goal-container').style.display = 'none';
             document.getElementById('goal-message').innerText = `Your goal is to pass the quiz ${minimumTimes} times with at least ${threshold}% consecutively.`;
             document.getElementById('start-quiz-button').style.display = 'inline-block';
         };
