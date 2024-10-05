@@ -54,12 +54,26 @@
         #quiz-container {
             display: none; /* Initially hidden */
         }
+        /* Styles for the histogram */
         #histogram {
             margin-top: 20px;
-            height: 200px; /* Set height for the histogram */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center items */
+        }
+        .bar {
+            background-color: #007bff;
+            margin: 5px 0; /* Vertical spacing between bars */
+            border-radius: 5px;
+            width: 80%; /* Bar width relative to the container */
+            transition: width 0.3s;
+        }
+        .label {
+            text-align: center;
+            margin-top: 5px; /* Space between the bar and the label */
+            font-size: 0.9em; /* Smaller font for labels */
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -89,16 +103,15 @@
 
         <div id="result-container" style="display:none;">
             <p class="result" id="result"></p>
+            <div id="histogram"></div> <!-- Container for the histogram -->
         </div>
-
-        <canvas id="histogram"></canvas> <!-- Added canvas for histogram -->
     </div>
 
     <script>
         let currentQuestionIndex = 0;
         let correctAnswersCount = 0;
         let questions = [];
-        let results = []; // Array to store quiz results
+        let quizAttempts = []; // Store the number of correct answers for each quiz attempt
 
         // Function to start the quiz and fetch questions
         function startQuiz() {
@@ -145,55 +158,29 @@
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('result-container').style.display = 'block';
             document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct!`;
-
-            // Store the result
-            results.push(correctAnswersCount);
-
-            // Draw the histogram
-            drawHistogram();
+            quizAttempts.push(correctAnswersCount); // Store the result for this attempt
+            showHistogram(); // Update the histogram
         }
 
-        // Function to draw the histogram using Chart.js
-        function drawHistogram() {
-            const ctx = document.getElementById('histogram').getContext('2d');
-            const labels = results.map((_, index) => `Attempt ${index + 1}`);
-            const data = {
-                labels: labels,
-                datasets: [{
-                    label: 'Correct Answers',
-                    data: results,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            };
+        // Function to show the histogram of quiz results
+        function showHistogram() {
+            const histogramContainer = document.getElementById('histogram');
+            histogramContainer.innerHTML = ''; // Clear previous histogram
+            const maxAttempts = Math.max(...quizAttempts, 1); // Get the max attempts for scaling
 
-            if (window.histogramChart) {
-                window.histogramChart.destroy(); // Destroy previous chart instance
-            }
+            quizAttempts.forEach((score, index) => {
+                const bar = document.createElement('div');
+                const barWidth = (score / maxAttempts) * 100; // Calculate width as a percentage
+                bar.className = 'bar';
+                bar.style.width = `${barWidth}%`; // Set the width of the bar
+                bar.innerText = `Attempt ${index + 1}: ${score}`; // Set the text inside the bar
 
-            window.histogramChart = new Chart(ctx, {
-                type: 'bar',
-                data: data,
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Correct Answers'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Quiz Attempts'
-                            }
-                        }
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
+                const label = document.createElement('div');
+                label.className = 'label';
+                label.innerText = `Attempt ${index + 1}`; // Label for the bar
+
+                histogramContainer.appendChild(bar); // Add bar to the histogram
+                histogramContainer.appendChild(label); // Add label below the bar
             });
         }
     </script>
