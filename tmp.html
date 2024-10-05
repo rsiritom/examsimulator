@@ -217,23 +217,10 @@
             quizAttempts.push(successRate);
             localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts)); 
 
-            // Log calculations to console
-            console.log(`Success Rate: ${successRate}%`);
-            console.log(`Successful Quizzes So Far: ${successfulQuizzes} out of ${minimumTimes}`);
-
-            // Check if the user met the goal
             if (successRate >= threshold) {
                 successfulQuizzes++;
-                console.log(`Met threshold: ${threshold}%`);
-            } else {
-                console.log(`Did not meet threshold: ${threshold}%`);
             }
 
-            // Log current successful quizzes and the goal
-            console.log(`Total Successful Quizzes: ${successfulQuizzes}`);
-            console.log(`Goal: Complete ${minimumTimes} successful quizzes to achieve your goal.`);
-
-            // Display messages based on the number of successful quizzes
             if (successfulQuizzes >= minimumTimes) {
                 alert("Congratulations! You've met your goal!");
             } else {
@@ -265,21 +252,10 @@
                 type: 'line',
                 data: data,
                 options: {
-                    responsive: true,
                     scales: {
                         y: {
                             beginAtZero: true,
                             max: 100,
-                            title: {
-                                display: true,
-                                text: 'Success Rate (%)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Quiz Attempts'
-                            }
                         }
                     }
                 }
@@ -289,17 +265,14 @@
         function clearHistory() {
             localStorage.removeItem('quizAttempts');
             quizAttempts = [];
-            document.getElementById('result').innerText = "Historical data cleared.";
-            if (chart) {
-                chart.destroy();
-            }
+            updateChart();
         }
-        // Add this section to initialize the chart on page load
+
         window.onload = function() {
-            // Retrieve quiz attempts from localStorage
             quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
-            
-            // Initialize chart with the retrieved attempts
+            if (quizAttempts.length > 0) {
+                document.getElementById('result-container').style.display = 'block';
+            }
             updateChart();
         };
     </script>
