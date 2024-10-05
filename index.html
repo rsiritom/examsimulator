@@ -66,11 +66,11 @@
             margin-top: 20px;
             max-width: 100%;
         }
-        .clear-history {
+        /* New button styling for clearing history */
+        button.clear-history {
             background-color: #dc3545;
-            margin-top: 20px;
         }
-        .clear-history:hover {
+        button.clear-history:hover {
             background-color: #c82333;
         }
     </style>
@@ -139,4 +139,92 @@
             const questionData = questions[currentQuestionIndex];
             document.getElementById('question-container').innerText = `Question: ${questionData.question}`;
             document.getElementById('optionA').innerText = `A: ${questionData.option_A}`;
-            document.getElementBy
+            document.getElementById('optionB').innerText = `B: ${questionData.option_B}`;
+            document.getElementById('optionC').innerText = `C: ${questionData.option_C}`;
+            document.getElementById('optionD').innerText = `D: ${questionData.option_D}`;
+            document.getElementById('progress').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        }
+
+        // Function to check the selected answer
+        function checkAnswer(selectedOption) {
+            const correctAnswer = questions[currentQuestionIndex].correct_answer;
+            if (selectedOption === correctAnswer) {
+                correctAnswersCount++;
+            }
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // Function to show the quiz result and update the chart
+        function showResult() {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('result-container').style.display = 'block';
+            document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct!`;
+
+            const successRate = (correctAnswersCount / questions.length) * 100;
+            quizAttempts.push(successRate); // Store the percentage of correct answers
+            localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts)); // Save attempts to localStorage
+
+            updateChart(); // Update the line chart to show the evolution
+        }
+
+        // Function to update the line chart
+        function updateChart() {
+            const ctx = document.getElementById('evolutionChart').getContext('2d');
+            const labels = quizAttempts.map((_, index) => `Attempt ${index + 1}`);
+            
+            if (chart) {
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = quizAttempts;
+                chart.update();
+            } else {
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Success Rate (%)',
+                            data: quizAttempts,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Function to clear the historical quiz data from localStorage
+        function clearHistory() {
+            if (confirm("Are you sure you want to clear the historical data?")) {
+                localStorage.removeItem('quizAttempts');
+                quizAttempts = []; // Reset the attempts array
+                updateChart(); // Update the chart to show empty data
+                document.getElementById('result-container').style.display = 'none'; // Hide the result container
+                alert("Historical data cleared!");
+            }
+        }
+
+        // Load the chart with historical data on page load
+        window.onload = function() {
+            if (quizAttempts.length > 0) {
+                updateChart(); // Display historical attempts if available
+                document.getElementById('result-container').style.display = 'block'; // Show the chart on page load
+            }
+        };
+    </script>
+</body>
+</html>
