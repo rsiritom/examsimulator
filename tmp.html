@@ -73,25 +73,23 @@
         button.clear-history:hover {
             background-color: #c82333;
         }
-        /* Goal setting styles */
         #goal-container {
             margin-bottom: 20px;
         }
         #goal-message {
             text-align: right;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Agile Quiz</h1>
-
-        <!-- Goal Setting Section -->
+        
         <div id="goal-container">
             <h2>Set Your Goal</h2>
-            <label for="threshold">Select Threshold:</label>
+            <label for="threshold">Threshold:</label>
             <select id="threshold">
                 <option value="10">10%</option>
                 <option value="20">20%</option>
@@ -104,7 +102,8 @@
                 <option value="90">90%</option>
                 <option value="95">95%</option>
             </select>
-            <label for="minimum_times">Select Minimum Times:</label>
+
+            <label for="minimum_times">Minimum Times:</label>
             <select id="minimum_times">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -117,10 +116,10 @@
                 <option value="9">9</option>
                 <option value="10">10</option>
             </select>
-            <button onclick="setGoal()">Set Goal</button>
+            
+            <button id="set-goal-button">Set Goal</button>
+            <div id="goal-message"></div>
         </div>
-
-        <div id="goal-message"></div>
 
         <p>Please select the number of questions you want to try:</p>
         <select id="question-count" style="width: 100%; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
@@ -132,8 +131,8 @@
             <option value="150">150</option>
             <option value="180">180</option>
         </select>
-        <button id="start-quiz-btn" onclick="startQuiz()" style="display: none;">Start Quiz</button>
-
+        <button onclick="startQuiz()" id="start-quiz-button" style="display:none;">Start Quiz</button>
+        
         <div id="quiz-container">
             <div id="question-container" class="question"></div>
             <div class="options">
@@ -162,21 +161,18 @@
         let questions = [];
         let quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || []; // Retrieve previous quiz attempts from localStorage
         let chart; // Global chart variable
-        let goalSet = false;
-        let threshold = 0;
-        let minimumTimes = 0;
-        let successfulQuizzes = 0;
+        let successfulQuizzes = 0; // Track successful quiz attempts
+        let threshold = 0; // User-defined threshold
+        let minimumTimes = 0; // User-defined minimum times
 
         // Function to set the user's goal
-        function setGoal() {
+        document.getElementById('set-goal-button').onclick = function() {
             threshold = parseInt(document.getElementById('threshold').value);
             minimumTimes = parseInt(document.getElementById('minimum_times').value);
-            goalSet = true;
-
             document.getElementById('goal-container').style.display = 'none';
             document.getElementById('goal-message').innerText = `Your goal is to pass the quiz ${minimumTimes} times with at least ${threshold}%`;
-            document.getElementById('start-quiz-btn').style.display = 'block';
-        }
+            document.getElementById('start-quiz-button').style.display = 'inline-block';
+        };
 
         // Function to start the quiz and fetch questions
         function startQuiz() {
@@ -232,40 +228,41 @@
             if (successRate >= threshold) {
                 successfulQuizzes++;
             }
+            
+            // Display messages based on the number of successful quizzes
             if (successfulQuizzes >= minimumTimes) {
                 document.getElementById('result').innerText += `\nCongratulations! You've achieved your goal!`;
+            } else {
+                document.getElementById('result').innerText += `\nYou need ${minimumTimes - successfulQuizzes} more successful quiz attempts to achieve your goal.`;
             }
 
             // Update the chart
             updateChart();
         }
 
-        // Function to update the chart
+        // Function to update the chart with the user's performance
         function updateChart() {
             const ctx = document.getElementById('evolutionChart').getContext('2d');
-            const labels = [...Array(quizAttempts.length).keys()].map(i => `Attempt ${i + 1}`);
-            const data = {
-                labels: labels,
-                datasets: [{
-                    label: 'Quiz Success Rate',
-                    data: quizAttempts,
-                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            };
-
             if (chart) {
-                chart.destroy(); // Destroy previous chart instance
+                chart.destroy(); // Destroy the previous chart instance
             }
             chart = new Chart(ctx, {
                 type: 'line',
-                data: data,
+                data: {
+                    labels: quizAttempts.map((_, index) => `Attempt ${index + 1}`),
+                    datasets: [{
+                        label: 'Success Rate (%)',
+                        data: quizAttempts,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true,
+                    }]
+                },
                 options: {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 100
+                            max: 100,
                         }
                     }
                 }
@@ -274,10 +271,14 @@
 
         // Function to clear historical data
         function clearHistory() {
-            quizAttempts = [];
             localStorage.removeItem('quizAttempts');
-            alert("Historical data cleared!");
-            updateChart(); // Update the chart to reflect cleared data
+            quizAttempts = [];
+            successfulQuizzes = 0; // Reset successful quizzes
+            document.getElementById('goal-message').innerText = ''; // Clear goal message
+            if (chart) {
+                chart.destroy(); // Destroy the previous chart instance
+            }
+            alert('Historical data cleared!');
         }
     </script>
 </body>
