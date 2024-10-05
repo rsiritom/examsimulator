@@ -59,7 +59,8 @@
             margin-top: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center items */
+            align-items: flex-start; /* Align items to the left */
+            width: 100%; /* Make histogram container full width */
         }
         .bar {
             background-color: #007bff;
@@ -72,6 +73,7 @@
             text-align: center;
             margin-top: 5px; /* Space between the bar and the label */
             font-size: 0.9em; /* Smaller font for labels */
+            display: none; /* Hide labels */
         }
     </style>
 </head>
@@ -169,14 +171,8 @@
             const barWidth = (correctAnswersCount / 5) * 100; // Calculate width as a percentage of 5
             bar.className = 'bar';
             bar.style.width = `${barWidth}%`; // Set the width of the bar
-            bar.innerText = `Attempt ${quizAttempts.length}: ${correctAnswersCount}`; // Set the text inside the bar
-
-            const label = document.createElement('div');
-            label.className = 'label';
-            label.innerText = `Attempt ${quizAttempts.length}`; // Label for the bar
-
+            // Remove the label element creation and append the bar directly to the histogram
             histogramContainer.appendChild(bar); // Add bar to the histogram
-            histogramContainer.appendChild(label); // Add label below the bar
         }
     </script>
 </body>
