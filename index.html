@@ -54,7 +54,12 @@
         #quiz-container {
             display: none; /* Initially hidden */
         }
+        #histogram {
+            margin-top: 20px;
+            height: 200px; /* Set height for the histogram */
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -85,12 +90,15 @@
         <div id="result-container" style="display:none;">
             <p class="result" id="result"></p>
         </div>
+
+        <canvas id="histogram"></canvas> <!-- Added canvas for histogram -->
     </div>
 
     <script>
         let currentQuestionIndex = 0;
         let correctAnswersCount = 0;
         let questions = [];
+        let results = []; // Array to store quiz results
 
         // Function to start the quiz and fetch questions
         function startQuiz() {
@@ -137,6 +145,56 @@
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('result-container').style.display = 'block';
             document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct!`;
+
+            // Store the result
+            results.push(correctAnswersCount);
+
+            // Draw the histogram
+            drawHistogram();
+        }
+
+        // Function to draw the histogram using Chart.js
+        function drawHistogram() {
+            const ctx = document.getElementById('histogram').getContext('2d');
+            const labels = results.map((_, index) => `Attempt ${index + 1}`);
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Correct Answers',
+                    data: results,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            };
+
+            if (window.histogramChart) {
+                window.histogramChart.destroy(); // Destroy previous chart instance
+            }
+
+            window.histogramChart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Correct Answers'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Quiz Attempts'
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
         }
     </script>
 </body>
