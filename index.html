@@ -12,8 +12,8 @@
             background-color: #f9f9f9;
         }
         .container {
-            width: 90%; /* Changed to 90% for better mobile responsiveness */
-            max-width: 600px; /* Added max-width to limit size on larger screens */
+            width: 90%;
+            max-width: 600px;
             margin: auto;
             padding: 20px;
             background-color: white;
@@ -30,48 +30,47 @@
         .options {
             margin-bottom: 20px;
             display: flex;
-            flex-direction: column; /* Stack options vertically */
+            flex-direction: column;
         }
         button {
             margin-top: 10px;
             padding: 10px;
             cursor: pointer;
-            background-color: #007bff; /* Button background color */
-            color: white; /* Button text color */
-            border: none; /* Remove border */
-            border-radius: 5px; /* Rounded corners */
-            font-size: 16px; /* Larger font size for better readability */
-            transition: background-color 0.3s; /* Smooth background color change */
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
         }
         button:hover {
-            background-color: #0056b3; /* Darker shade on hover */
+            background-color: #0056b3;
         }
         .result {
-            font-size: 1.5em; /* Increased font size for results */
+            font-size: 1.5em;
             font-weight: bold;
-            text-align: center; /* Center the result text */
+            text-align: center;
         }
         #quiz-container {
-            display: none; /* Initially hidden */
+            display: none;
         }
-        /* Styles for the histogram */
         #histogram {
             margin-top: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center items */
+            align-items: center;
         }
         .bar {
             background-color: #007bff;
-            margin: 5px 0; /* Vertical spacing between bars */
+            margin: 5px 0;
             border-radius: 5px;
-            width: 80%; /* Bar width relative to the container */
+            width: 80%;
             transition: width 0.3s;
         }
         .label {
             text-align: center;
-            margin-top: 5px; /* Space between the bar and the label */
-            font-size: 0.9em; /* Smaller font for labels */
+            margin-top: 5px;
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -103,7 +102,7 @@
 
         <div id="result-container" style="display:none;">
             <p class="result" id="result"></p>
-            <div id="histogram"></div> <!-- Container for the histogram -->
+            <div id="histogram"></div>
         </div>
     </div>
 
@@ -111,9 +110,8 @@
         let currentQuestionIndex = 0;
         let correctAnswersCount = 0;
         let questions = [];
-        let quizAttempts = []; // Store the number of correct answers for each quiz attempt
+        let quizAttempts = []; // Store the number of correct answers and total questions for each quiz attempt
 
-        // Function to start the quiz and fetch questions
         function startQuiz() {
             const questionCount = document.getElementById('question-count').value;
             fetch(`https://quientecrea.pythonanywhere.com/api/v1/questions/${questionCount}`)
@@ -128,7 +126,6 @@
                 });
         }
 
-        // Function to display the current question and options
         function showQuestion() {
             const questionData = questions[currentQuestionIndex];
             document.getElementById('question-container').innerText = `Question: ${questionData.question}`;
@@ -139,7 +136,6 @@
             document.getElementById('progress').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
         }
 
-        // Function to check if the user's answer is correct
         function checkAnswer(selectedOption) {
             const correctAnswer = questions[currentQuestionIndex].correct_answer;
             if (selectedOption === correctAnswer) {
@@ -153,30 +149,42 @@
             }
         }
 
-        // Function to show the result at the end of the quiz
         function showResult() {
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('result-container').style.display = 'block';
             document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct!`;
-            quizAttempts.push(correctAnswersCount); // Store the result for this attempt
+            quizAttempts.push({ correct: correctAnswersCount, total: questions.length }); // Store the result for this attempt
             showHistogram(); // Update the histogram
         }
 
-        // Function to show the histogram of quiz results
         function showHistogram() {
             const histogramContainer = document.getElementById('histogram');
-            const bar = document.createElement('div');
-            const barWidth = (correctAnswersCount / 5) * 100; // Calculate width as a percentage of 5
-            bar.className = 'bar';
-            bar.style.width = `${barWidth}%`; // Set the width of the bar
-            bar.innerText = `Attempt ${quizAttempts.length}: ${correctAnswersCount}`; // Set the text inside the bar
+            // Create a bar for correct answers
+            const correctBar = document.createElement('div');
+            const correctBarWidth = (correctAnswersCount / questions.length) * 100; // Calculate width as a percentage of total questions
+            correctBar.className = 'bar';
+            correctBar.style.width = `${correctBarWidth}%`;
+            correctBar.innerText = `Attempt ${quizAttempts.length}: ${correctAnswersCount} correct`;
+            histogramContainer.appendChild(correctBar); 
 
-            const label = document.createElement('div');
-            label.className = 'label';
-            label.innerText = `Attempt ${quizAttempts.length}`; // Label for the bar
+            const correctLabel = document.createElement('div');
+            correctLabel.className = 'label';
+            correctLabel.innerText = `Attempt ${quizAttempts.length}`;
+            histogramContainer.appendChild(correctLabel);
 
-            histogramContainer.appendChild(bar); // Add bar to the histogram
-            histogramContainer.appendChild(label); // Add label below the bar
+            // Create a bar for total questions
+            const totalBar = document.createElement('div');
+            const totalBarWidth = (questions.length / 5) * 100; // Scale total questions to a width
+            totalBar.className = 'bar';
+            totalBar.style.backgroundColor = '#4caf50'; // Different color for total questions
+            totalBar.style.width = `${totalBarWidth}%`;
+            totalBar.innerText = `Total Questions: ${questions.length}`;
+            histogramContainer.appendChild(totalBar); 
+
+            const totalLabel = document.createElement('div');
+            totalLabel.className = 'label';
+            totalLabel.innerText = `Total Questions`;
+            histogramContainer.appendChild(totalLabel);
         }
     </script>
 </body>
