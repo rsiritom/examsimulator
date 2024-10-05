@@ -66,7 +66,7 @@
             background-color: #007bff;
             margin: 5px 0; /* Vertical spacing between bars */
             border-radius: 5px;
-            width: 80%; /* Bar width relative to the container */
+            width: 80%; /* Default bar width */
             transition: width 0.3s;
         }
         .label {
@@ -171,7 +171,6 @@
             const barWidth = (correctAnswersCount / 5) * 100; // Calculate width as a percentage of 5
             bar.className = 'bar';
             bar.style.width = `${barWidth}%`; // Set the width of the bar
-            // Remove the label element creation and append the bar directly to the histogram
             histogramContainer.appendChild(bar); // Add bar to the histogram
         }
     </script>
