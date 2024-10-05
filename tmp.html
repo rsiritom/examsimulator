@@ -80,10 +80,17 @@
             font-weight: bold;
             margin-top: 10px;
         }
+        #current-goal {
+            text-align: center; /* Center the goal message */
+            font-weight: bold;
+            margin-bottom: 10px; /* Space between goal and title */
+            color: #007bff; /* Color for emphasis */
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div id="current-goal"></div> <!-- New div for displaying current goal -->
         <h1>PMP Simulator</h1>
         
         <div id="goal-container">
@@ -172,6 +179,7 @@
                 minimumTimes = parseInt(savedMinimumTimes);
                 document.getElementById('goal-container').style.display = 'none';
                 document.getElementById('goal-message').innerText = `Your goal is to pass the quiz ${minimumTimes} times with at least ${threshold}% consecutively.`;
+                document.getElementById('current-goal').innerText = `Current Goal: Pass ${minimumTimes} times with at least ${threshold}%`; // Set current goal text
                 document.getElementById('start-quiz-button').style.display = 'inline-block'; // Show Start Quiz button
             } else {
                 document.getElementById('start-quiz-button').style.display = 'none'; // Hide Start Quiz button if no goal
@@ -185,6 +193,7 @@
             localStorage.setItem('minimumTimes', minimumTimes); // Save goal to localStorage
             document.getElementById('goal-container').style.display = 'none';
             document.getElementById('goal-message').innerText = `Your goal is to pass the quiz ${minimumTimes} times with at least ${threshold}% consecutively.`;
+            document.getElementById('current-goal').innerText = `Current Goal: Pass ${minimumTimes} times with at least ${threshold}%`; // Update current goal text
             document.getElementById('start-quiz-button').style.display = 'inline-block';
         };
 
@@ -213,8 +222,8 @@
         }
 
         function checkAnswer(selectedOption) {
-            const correctAnswer = questions[currentQuestionIndex].correct_answer;
-            if (selectedOption === correctAnswer) {
+            const questionData = questions[currentQuestionIndex];
+            if (questionData.correct_answer === selectedOption) {
                 correctAnswersCount++;
             }
             currentQuestionIndex++;
@@ -226,81 +235,77 @@
         }
 
         function showResult() {
+            const resultPercentage = (correctAnswersCount / questions.length) * 100;
+            const resultMessage = `You answered ${correctAnswersCount} out of ${questions.length} correctly. (${resultPercentage.toFixed(2)}%)`;
+            document.getElementById('result').innerText = resultMessage;
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('result-container').style.display = 'block';
-            const score = (correctAnswersCount / questions.length) * 100;
-            document.getElementById('result').innerText = `Your score: ${score.toFixed(2)}%`;
 
-            // Save the score to local storage
-            quizAttempts.push(score);
+            // Track historical attempts
+            quizAttempts.push({
+                date: new Date().toISOString(),
+                percentage: resultPercentage,
+                passed: resultPercentage >= threshold,
+            });
             localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts));
-            evaluateQuizAttempts(score);
-            drawChart();
-        }
 
-        function evaluateQuizAttempts(score) {
-            const passed = score >= threshold;
-            if (passed) {
+            // Check if the user passed this attempt
+            if (resultPercentage >= threshold) {
                 consecutiveSuccessfulQuizzes++;
             } else {
-                consecutiveSuccessfulQuizzes = 0;
+                consecutiveSuccessfulQuizzes = 0; // Reset if the attempt fails
             }
+
             if (consecutiveSuccessfulQuizzes >= minimumTimes) {
-                alert(`Congratulations! You've passed the quiz ${minimumTimes} times with at least ${threshold}% consecutively.`);
-                clearGoal();
-            }
+                alert(`Congratulations! You've met your goal of passing the quiz ${minimumTimes} times with at least ${threshold}%!`);
+				consecutiveSuccessfulQuizzes = 0
+				clearGoal();
+			}
+
+            drawEvolutionChart();
         }
 
-        function clearGoal() {
-            localStorage.removeItem('threshold');
-            localStorage.removeItem('minimumTimes');
-            threshold = 0;
-            minimumTimes = 0;
-            document.getElementById('goal-message').innerText = '';
-            document.getElementById('goal-container').style.display = 'block';
-            document.getElementById('start-quiz-button').style.display = 'none';
-        }
-
-        function drawChart() {
+        function drawEvolutionChart() {
+            const attempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
+            const labels = attempts.map((attempt, index) => `Attempt ${index + 1}`);
+            const data = attempts.map(attempt => attempt.percentage);
             const ctx = document.getElementById('evolutionChart').getContext('2d');
+
             if (chart) {
                 chart.destroy(); // Destroy previous chart instance
             }
+
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: Array.from({length: quizAttempts.length}, (_, i) => i + 1),
+                    labels: labels,
                     datasets: [{
-                        label: 'Quiz Score Evolution',
-                        data: quizAttempts,
+                        label: 'Quiz Performance (%)',
+                        data: data,
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 2,
-                        fill: false
-                    }]
+                        fill: false,
+                    }],
                 },
                 options: {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    }
-                }
+                            max: 100,
+                        },
+                    },
+                },
             });
         }
 
         function clearHistory() {
-            quizAttempts = [];
             localStorage.removeItem('quizAttempts');
-            drawChart();
+            alert('Historical data cleared.');
+            location.reload(); // Reload the page
         }
 
-        // Load the goal on page load
-        window.onload = loadGoal;
+        // Initialize
+        loadGoal();
     </script>
 </body>
 </html>
