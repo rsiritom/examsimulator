@@ -224,8 +224,9 @@
             }
 
             if (consecutiveSuccessfulQuizzes >= minimumTimes) {
-                alert("Congratulations! You've met your goal with 3 consecutive successes!");
+                alert(`Congratulations! You've met your goal with ${minimumTimes} consecutive successes!`);
                 consecutiveSuccessfulQuizzes = 0; // Reset after meeting the goal
+                document.getElementById('goal-container').style.display = 'block'; // Prompt for new goal
             } else {
                 const remainingAttempts = minimumTimes - consecutiveSuccessfulQuizzes;
                 alert(`You need ${remainingAttempts} more consecutive successful quizzes to reach your goal.`);
@@ -236,27 +237,34 @@
 
         function updateChart() {
             const ctx = document.getElementById('evolutionChart').getContext('2d');
-            const data = {
-                labels: Array.from({ length: quizAttempts.length }, (_, i) => `Attempt ${i + 1}`),
-                datasets: [{
-                    label: 'Success Rate (%)',
-                    data: quizAttempts,
-                    borderColor: 'rgb(75, 192, 192)',
-                    fill: false,
-                    tension: 0.1
-                }]
-            };
-
             if (chart) {
-                chart.destroy();
+                chart.destroy(); // Clear the existing chart
             }
-
             chart = new Chart(ctx, {
                 type: 'line',
-                data: data,
+                data: {
+                    labels: Array.from({ length: quizAttempts.length }, (_, i) => i + 1),
+                    datasets: [{
+                        label: 'Success Rate',
+                        data: quizAttempts,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
                 options: {
                     scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Attempts'
+                            }
+                        },
                         y: {
+                            title: {
+                                display: true,
+                                text: 'Success Rate (%)'
+                            },
                             beginAtZero: true,
                             max: 100
                         }
@@ -268,19 +276,8 @@
         function clearHistory() {
             localStorage.removeItem('quizAttempts');
             quizAttempts = [];
-            if (chart) {
-                chart.destroy();
-            }
-            document.getElementById('result').innerText = '';
-            consecutiveSuccessfulQuizzes = 0;
+            updateChart(); // Refresh chart
         }
-        window.onload = function() {
-            quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
-            if (quizAttempts.length > 0) {
-                document.getElementById('result-container').style.display = 'block';
-            }
-            updateChart();
-        };
     </script>
 </body>
 </html>
