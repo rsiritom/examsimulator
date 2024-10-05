@@ -64,7 +64,7 @@
             margin-bottom: 20px;
         }
         .bar {
-            background-color: #007bff;
+            height: 20px;
             margin: 5px 0;
             border-radius: 5px;
             transition: width 0.3s;
@@ -74,11 +74,6 @@
         }
         .bar.total {
             background-color: #4caf50;
-        }
-        .label {
-            text-align: center;
-            margin-top: 5px;
-            font-size: 0.9em;
         }
     </style>
 </head>
@@ -177,24 +172,16 @@
                 const correctBar = document.createElement('div');
                 correctBar.className = 'bar correct';
                 correctBar.style.width = `${(attempt.correct / attempt.total) * 100}%`;
-                correctBar.innerText = `${index + 1}: ${attempt.correct}`;
                 attemptBars.appendChild(correctBar);
 
                 // Bar for total questions
                 const totalBar = document.createElement('div');
                 totalBar.className = 'bar total';
                 totalBar.style.width = '100%'; // Total bar always fills the width
-                totalBar.innerText = `${attempt.total}`;
                 attemptBars.appendChild(totalBar);
 
                 // Add the set of bars to the histogram container
                 histogramContainer.appendChild(attemptBars);
-
-                // Label for each attempt
-                const attemptLabel = document.createElement('div');
-                attemptLabel.className = 'label';
-                attemptLabel.innerText = `Attempt ${index + 1}`;
-                histogramContainer.appendChild(attemptLabel);
             });
         }
     </script>
