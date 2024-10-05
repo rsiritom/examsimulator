@@ -224,6 +224,7 @@
 
             // Display messages based on the number of successful quizzes
             if (successfulQuizzes >= minimumTimes) {
+                alert("Congratulations! You've achieved your goal!"); // Dialog box for goal completion
                 document.getElementById('result').innerText += `\nCongratulations! You've achieved your goal!`;
             } else {
                 document.getElementById('result').innerText += `\nYou need ${minimumTimes - successfulQuizzes} more successful quiz attempts to achieve your goal.`;
@@ -234,26 +235,40 @@
 
         function updateChart() {
             const ctx = document.getElementById('evolutionChart').getContext('2d');
+            const data = {
+                labels: Array.from({ length: quizAttempts.length }, (_, i) => `Attempt ${i + 1}`),
+                datasets: [{
+                    label: 'Success Rate (%)',
+                    data: quizAttempts,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                }]
+            };
+
             if (chart) {
                 chart.destroy();
             }
+
             chart = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: quizAttempts.map((_, index) => `Attempt ${index + 1}`),
-                    datasets: [{
-                        label: 'Success Rate (%)',
-                        data: quizAttempts,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        fill: true,
-                    }]
-                },
+                data: data,
                 options: {
+                    responsive: true,
                     scales: {
                         y: {
                             beginAtZero: true,
                             max: 100,
+                            title: {
+                                display: true,
+                                text: 'Success Rate (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Quiz Attempts'
+                            }
                         }
                     }
                 }
@@ -263,12 +278,10 @@
         function clearHistory() {
             localStorage.removeItem('quizAttempts');
             quizAttempts = [];
-            successfulQuizzes = 0;
-            document.getElementById('goal-message').innerText = '';
+            document.getElementById('result').innerText = "Historical data cleared.";
             if (chart) {
                 chart.destroy();
             }
-            alert('Historical data cleared!');
         }
     </script>
 </body>
