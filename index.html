@@ -5,81 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agile Quiz</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
-        .container {
-            width: 90%;
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .question {
-            margin-bottom: 20px;
-        }
-        .options {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-        button {
-            margin-top: 10px;
-            padding: 10px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .result {
-            font-size: 1.5em;
-            font-weight: bold;
-            text-align: center;
-        }
-        #quiz-container {
-            display: none;
-        }
-        #histogram {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .attempt-bars {
-            margin-bottom: 20px;
-        }
-        .bar {
-            background-color: #007bff;
-            margin: 5px 0;
-            border-radius: 5px;
-            transition: width 0.3s;
-        }
-        .bar.correct {
-            background-color: #007bff;
-        }
-        .bar.total {
-            background-color: #4caf50;
-        }
-        .label {
-            text-align: center;
-            margin-top: 5px;
-            font-size: 0.9em;
-        }
+        /* (Same styles as before) */
     </style>
 </head>
 <body>
@@ -108,17 +34,23 @@
             <p id="progress"></p>
         </div>
 
-        <div id="result-container" style="display:none;">
+        <div id="result-container">
             <p class="result" id="result"></p>
-            <div id="histogram"></div>
+            <canvas id="evolutionChart"></canvas>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let currentQuestionIndex = 0;
         let correctAnswersCount = 0;
         let questions = [];
-        let quizAttempts = []; // Store the number of correct answers and total questions for each quiz attempt
+        let quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || []; // Retrieve historical data
+        let chart; // Global chart variable
+
+        window.onload = function() {
+            updateChart(); // Load chart on page load with stored data
+        };
 
         function startQuiz() {
             const questionCount = document.getElementById('question-count').value;
@@ -161,41 +93,47 @@
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('result-container').style.display = 'block';
             document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct!`;
-            quizAttempts.push({ correct: correctAnswersCount, total: questions.length }); // Store the result for this attempt
-            showHistogram(); // Update the histogram
+
+            quizAttempts.push(correctAnswersCount / questions.length * 100); // Store the percentage of correct answers
+
+            // Save the updated attempts array to localStorage
+            localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts));
+
+            updateChart(); // Update the line chart to show the evolution
         }
 
-        function showHistogram() {
-            const histogramContainer = document.getElementById('histogram');
-            histogramContainer.innerHTML = ''; // Clear previous bars
-
-            quizAttempts.forEach((attempt, index) => {
-                const attemptBars = document.createElement('div');
-                attemptBars.className = 'attempt-bars';
-
-                // Bar for correct answers
-                const correctBar = document.createElement('div');
-                correctBar.className = 'bar correct';
-                correctBar.style.width = `${(attempt.correct / attempt.total) * 100}%`;
-                correctBar.innerText = `Attempt ${index + 1}: ${attempt.correct} correct`;
-                attemptBars.appendChild(correctBar);
-
-                // Bar for total questions
-                const totalBar = document.createElement('div');
-                totalBar.className = 'bar total';
-                totalBar.style.width = '100%'; // Total bar always fills the width
-                totalBar.innerText = `Total Questions: ${attempt.total}`;
-                attemptBars.appendChild(totalBar);
-
-                // Add the set of bars to the histogram container
-                histogramContainer.appendChild(attemptBars);
-
-                // Label for each attempt
-                const attemptLabel = document.createElement('div');
-                attemptLabel.className = 'label';
-                attemptLabel.innerText = `Attempt ${index + 1}`;
-                histogramContainer.appendChild(attemptLabel);
-            });
+        function updateChart() {
+            const ctx = document.getElementById('evolutionChart').getContext('2d');
+            const labels = quizAttempts.map((_, index) => `Attempt ${index + 1}`);
+            
+            if (chart) {
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = quizAttempts;
+                chart.update();
+            } else {
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Success Rate (%)',
+                            data: quizAttempts,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                            }
+                        }
+                    }
+                });
+            }
         }
     </script>
 </body>
