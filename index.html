@@ -177,14 +177,14 @@
                 const correctBar = document.createElement('div');
                 correctBar.className = 'bar correct';
                 correctBar.style.width = `${(attempt.correct / attempt.total) * 100}%`;
-                correctBar.innerText = `Attempt ${index + 1}: ${attempt.correct} correct`;
+                correctBar.innerText = `${index + 1}: ${attempt.correct}`;
                 attemptBars.appendChild(correctBar);
 
                 // Bar for total questions
                 const totalBar = document.createElement('div');
                 totalBar.className = 'bar total';
                 totalBar.style.width = '100%'; // Total bar always fills the width
-                totalBar.innerText = `Total Questions: ${attempt.total}`;
+                totalBar.innerText = `${attempt.total}`;
                 attemptBars.appendChild(totalBar);
 
                 // Add the set of bars to the histogram container
