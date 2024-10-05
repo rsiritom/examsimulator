@@ -159,15 +159,15 @@
         let questions = [];
         let quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
         let chart; 
-        let successfulQuizzes = 0; 
         let threshold = 0; 
         let minimumTimes = 0; 
+        let consecutiveSuccessfulQuizzes = 0; // Track consecutive successful quizzes
 
         document.getElementById('set-goal-button').onclick = function() {
             threshold = parseInt(document.getElementById('threshold').value);
             minimumTimes = parseInt(document.getElementById('minimum_times').value);
             document.getElementById('goal-container').style.display = 'none';
-            document.getElementById('goal-message').innerText = `Your goal is to pass the quiz ${minimumTimes} times with at least ${threshold}%`;
+            document.getElementById('goal-message').innerText = `Your goal is to pass the quiz ${minimumTimes} times with at least ${threshold}% consecutively.`;
             document.getElementById('start-quiz-button').style.display = 'inline-block';
         };
 
@@ -218,14 +218,17 @@
             localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts)); 
 
             if (successRate >= threshold) {
-                successfulQuizzes++;
+                consecutiveSuccessfulQuizzes++; // Increment consecutive count on success
+            } else {
+                consecutiveSuccessfulQuizzes = 0; // Reset consecutive count on failure
             }
 
-            if (successfulQuizzes >= minimumTimes) {
-                alert("Congratulations! You've met your goal!");
+            if (consecutiveSuccessfulQuizzes >= minimumTimes) {
+                alert("Congratulations! You've met your goal with 3 consecutive successes!");
+                consecutiveSuccessfulQuizzes = 0; // Reset after meeting the goal
             } else {
-                const remainingAttempts = minimumTimes - successfulQuizzes;
-                alert(`You need ${remainingAttempts} more successful quizzes to reach your goal.`);
+                const remainingAttempts = minimumTimes - consecutiveSuccessfulQuizzes;
+                alert(`You need ${remainingAttempts} more consecutive successful quizzes to reach your goal.`);
             }
 
             updateChart();
@@ -238,9 +241,9 @@
                 datasets: [{
                     label: 'Success Rate (%)',
                     data: quizAttempts,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 2,
+                    borderColor: 'rgb(75, 192, 192)',
                     fill: false,
+                    tension: 0.1
                 }]
             };
 
@@ -255,7 +258,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 100,
+                            max: 100
                         }
                     }
                 }
@@ -265,16 +268,12 @@
         function clearHistory() {
             localStorage.removeItem('quizAttempts');
             quizAttempts = [];
-            updateChart();
-        }
-
-        window.onload = function() {
-            quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
-            if (quizAttempts.length > 0) {
-                document.getElementById('result-container').style.display = 'block';
+            if (chart) {
+                chart.destroy();
             }
-            updateChart();
-        };
+            document.getElementById('result').innerText = '';
+            consecutiveSuccessfulQuizzes = 0;
+        }
     </script>
 </body>
 </html>
