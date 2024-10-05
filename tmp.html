@@ -132,6 +132,9 @@
             <button onclick="setGoal()">Set Goal</button>
         </div>
 
+        <!-- Start Quiz Button -->
+        <button id="start-quiz-btn" style="display: none;" onclick="startQuiz()">Start Quiz</button>
+
         <div id="quiz-container">
             <div id="question-container" class="question"></div>
             <div class="options">
@@ -174,6 +177,9 @@
             // Display the goal text
             document.getElementById('goal-text').innerText = `Goal: ${goalThreshold}% success rate, ${minimumTimes} times`;
             document.getElementById('goal-text').style.display = 'block';
+
+            // Show the "Start Quiz" button
+            document.getElementById('start-quiz-btn').style.display = 'block';
         }
 
         // Function to start the quiz and fetch questions
@@ -187,6 +193,7 @@
                     correctAnswersCount = 0;
                     document.getElementById('quiz-container').style.display = 'block';
                     document.getElementById('result-container').style.display = 'none';
+                    document.getElementById('start-quiz-btn').style.display = 'none';
                     showQuestion();  // Show the first question
                 });
         }
@@ -229,7 +236,6 @@
             localStorage.removeItem('quizAttempts');
             alert('Historical data cleared!');
         }
-
     </script>
 </body>
 </html>
