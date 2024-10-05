@@ -203,10 +203,20 @@
             if (currentQuestionIndex < questions.length) {
                 const currentQuestion = questions[currentQuestionIndex];
                 document.getElementById('question-container').innerText = currentQuestion.question;
-                document.getElementById('optionA').innerText = currentQuestion.options.A;
-                document.getElementById('optionB').innerText = currentQuestion.options.B;
-                document.getElementById('optionC').innerText = currentQuestion.options.C;
-                document.getElementById('optionD').innerText = currentQuestion.options.D;
+
+                // Check if options are present and assign to buttons
+                if (currentQuestion.options) {
+                    document.getElementById('optionA').innerText = currentQuestion.options.A || 'Option A';
+                    document.getElementById('optionB').innerText = currentQuestion.options.B || 'Option B';
+                    document.getElementById('optionC').innerText = currentQuestion.options.C || 'Option C';
+                    document.getElementById('optionD').innerText = currentQuestion.options.D || 'Option D';
+                } else {
+                    document.getElementById('optionA').innerText = 'Option A';
+                    document.getElementById('optionB').innerText = 'Option B';
+                    document.getElementById('optionC').innerText = 'Option C';
+                    document.getElementById('optionD').innerText = 'Option D';
+                }
+
                 document.getElementById('progress').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
             } else {
                 showResult();
@@ -220,20 +230,56 @@
                 correctAnswersCount++;
             }
             currentQuestionIndex++;
-            showQuestion();  // Move to the next question
+            showQuestion(); // Show the next question
         }
 
-        // Function to show the result
+        // Function to display the result after finishing the quiz
         function showResult() {
-            const score = (correctAnswersCount / questions.length) * 100;
-            document.getElementById('result').innerText = `You scored: ${score}%`;
-            document.getElementById('result-container').style.display = 'block';
             document.getElementById('quiz-container').style.display = 'none';
+            const successRate = (correctAnswersCount / questions.length) * 100;
+            document.getElementById('result').innerText = `You answered ${correctAnswersCount} out of ${questions.length} correctly! Your success rate is ${successRate.toFixed(2)}%.`;
+
+            // Update historical data
+            quizAttempts.push(successRate);
+            localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts));
+
+            // Prepare data for the chart
+            const labels = quizAttempts.map((_, index) => `Attempt ${index + 1}`);
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Success Rate',
+                    data: quizAttempts,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false,
+                }]
+            };
+            const ctx = document.getElementById('evolutionChart').getContext('2d');
+            if (chart) {
+                chart.destroy();
+            }
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('result-container').style.display = 'block';
         }
 
-        // Clear historical data
+        // Function to clear historical data
         function clearHistory() {
             localStorage.removeItem('quizAttempts');
+            quizAttempts = [];
             alert('Historical data cleared!');
         }
     </script>
