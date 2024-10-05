@@ -102,7 +102,7 @@
                 <option value="95">95%</option>
             </select>
 
-            <label for="minimum_times">Minimum Times:</label>
+            <label for="minimum_times">Times:</label>
             <select id="minimum_times">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -168,7 +168,7 @@
             minimumTimes = parseInt(document.getElementById('minimum_times').value);
 			consecutiveSuccessfulQuizzes = 0
             //document.getElementById('goal-container').style.display = 'none';
-            document.getElementById('goal-message').innerText = `Your goal is to pass the quiz ${minimumTimes} times with at least ${threshold}% consecutively.`;
+            //document.getElementById('goal-message').innerText = `Your goal is to pass the quiz ${minimumTimes} times with at least ${threshold}% consecutively.`;
             document.getElementById('start-quiz-button').style.display = 'inline-block';
         };
 
