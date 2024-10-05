@@ -132,6 +132,9 @@
             <button onclick="setGoal()">Set Goal</button>
         </div>
 
+        <!-- Start Quiz button -->
+        <button id="start-quiz" onclick="startQuiz()">Start Quiz</button>
+
         <div id="quiz-container">
             <div id="question-container" class="question"></div>
             <div class="options">
@@ -174,6 +177,9 @@
             // Display the goal text
             document.getElementById('goal-text').innerText = `Goal: ${goalThreshold}% success rate, ${minimumTimes} times`;
             document.getElementById('goal-text').style.display = 'block';
+
+            // Show the start quiz button after setting the goal
+            document.getElementById('start-quiz').style.display = 'block';
         }
 
         // Function to start the quiz and fetch questions
@@ -187,6 +193,7 @@
                     correctAnswersCount = 0;
                     document.getElementById('quiz-container').style.display = 'block';
                     document.getElementById('result-container').style.display = 'none';
+                    document.getElementById('start-quiz').style.display = 'none';  // Hide start quiz button
                     showQuestion();
                 });
         }
