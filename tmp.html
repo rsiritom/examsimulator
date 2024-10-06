@@ -81,19 +81,22 @@
             margin-top: 10px;
         }
         .progress-bar-container {
-            width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            height: 20px;
-            overflow: hidden;
-        }
+			width: 100%;
+			background-color: #e0e0e0;
+			border-radius: 10px;
+			height: 20px;
+			overflow: hidden;
+		}
         .progress-bar {
-            height: 100%;
-            background-color: #28a745;
-            border-radius: 10px;
-            width: 0;
-            transition: width 0.3s;
-        }
+			height: 100%;
+			background-color: #28a745; /* Green color */
+			width: 0; /* Starts from 0% width */
+			transition: width 0.3s ease;
+			border-top-left-radius: 10px; /* Rounded left side */
+			border-bottom-left-radius: 10px;
+			border-top-right-radius: 0; /* Flat right side */
+			border-bottom-right-radius: 0;
+		}
         .correct-answer {
             background-color: #28a745 !important;
             color: white;
@@ -138,7 +141,7 @@
                 </select>
                 
                 <button id="set-goal-button">Set Goal</button>
-                <div id="goal-message"></div>
+                
             </div>
         </center>
         <center>
@@ -159,6 +162,12 @@
                 <button class="clear-history" onclick="clearHistory()">Clear Data</button>
                 <div id="setquiz-message"></div>
             </div>
+			<div class="goal-message-container">
+				<div id="goal-message"></div>
+			</div>
+			<div class="progress-bar-container">
+				<div id="goal-progress-bar" class="progress-bar"></div>
+			</div>
         </center>
         
         <div id="quiz-container">
@@ -177,9 +186,7 @@
             <canvas id="evolutionChart"></canvas>
         </div>
 
-        <div class="progress-bar-container">
-            <div id="goal-progress-bar" class="progress-bar"></div>
-        </div>
+
 
     </div>
 
@@ -200,6 +207,7 @@
 			threshold = parseInt(document.getElementById('threshold').value);
 			minimumTimes = parseInt(document.getElementById('minimum_times').value);
 			resetCounters(); // Reset counters when a new goal is set
+			//resetQuizAttempts(); // Clear previous quiz attempts to start fresh
 			document.getElementById('setquiz-container').style.display = 'inline-block';
 			document.getElementById('start-quiz-button').style.display = 'inline-block';        
 		};
@@ -300,9 +308,11 @@
 
 		function updateProgressBar(progress, goal) {
 			if (goal > 0) {
-				const percentage = (progress / goal) * 100;
-				document.getElementById('goal-progress-bar').style.width = `${percentage}%`;
+				const percentage = (progress / goal) * 100; // Calculate percentage
+				document.getElementById('goal-progress-bar').style.width = `${percentage}%`; // Apply the width
 				document.getElementById('goal-message').innerText = `Progress: ${progress} out of ${goal}`;
+			} else {
+				document.getElementById('goal-progress-bar').style.width = '0%'; // Set to 0% if no goal
 			}
 		}
 
@@ -331,11 +341,28 @@
 				}
 			});
 		}
+		
+		function resetQuizAttempts() {
+			quizAttempts = []; // Clear the previous quiz attempts
+			localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts)); // Update local storage
+			updateChart(); // Reflect the cleared data in the chart
+		}
 
 		function clearHistory() {
 			localStorage.removeItem('quizAttempts');
 			quizAttempts = [];
-			updateChart();
+			threshold = 0; // Reset threshold
+			minimumTimes = 0; // Reset minimum times
+			consecutiveSuccessfulQuizzes = 0; // Reset consecutive successful quizzes
+			goalReached = false; // Reset goal reached status
+
+			// Reset the UI elements
+			document.getElementById('goal-message').innerText = ""; // Clear goal message
+			document.getElementById('goal-progress-bar').style.width = '0%'; // Reset progress bar visually
+			updateProgressBar(totalPasses, minimumTimes); // Reset progress bar values
+			document.getElementById('threshold').value = "10"; // Reset threshold dropdown to default value
+			document.getElementById('minimum_times').value = "1"; // Reset minimum times dropdown to default value
+			updateChart(); // Update chart to reflect cleared data
 		}
 	</script>
 </body>
