@@ -80,6 +80,20 @@
             font-weight: bold;
             margin-top: 10px;
         }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #28a745;
+            border-radius: 10px;
+            width: 0;
+            transition: width 0.3s;
+        }
         .correct-answer {
             background-color: #28a745 !important;
             color: white;
@@ -163,129 +177,166 @@
             <canvas id="evolutionChart"></canvas>
         </div>
 
+        <div class="progress-bar-container">
+            <div id="goal-progress-bar" class="progress-bar"></div>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        let currentQuestionIndex = 0;
-        let correctAnswersCount = 0;
-        let questions = [];
-        let quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
-        let chart; 
-        let threshold = 0; 
-        let minimumTimes = 0; 
-        let consecutiveSuccessfulQuizzes = 0;
+	<script>
+		let currentQuestionIndex = 0;
+		let correctAnswersCount = 0;
+		let questions = [];
+		let quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
+		let chart; 
+		let threshold = 0; 
+		let minimumTimes = 0; 
+		let consecutiveSuccessfulQuizzes = 0;
+		let totalPasses = 0; // Tracks the number of consecutive passes
+		let goalReached = false; // Tracks if the goal has been reached
 
-        document.getElementById('set-goal-button').onclick = function() {
-            threshold = parseInt(document.getElementById('threshold').value);
-            minimumTimes = parseInt(document.getElementById('minimum_times').value);
-            consecutiveSuccessfulQuizzes = 0;
-            document.getElementById('setquiz-container').style.display = 'inline-block';
-            document.getElementById('start-quiz-button').style.display = 'inline-block';        
-        };
+		document.getElementById('set-goal-button').onclick = function() {
+			threshold = parseInt(document.getElementById('threshold').value);
+			minimumTimes = parseInt(document.getElementById('minimum_times').value);
+			resetCounters(); // Reset counters when a new goal is set
+			document.getElementById('setquiz-container').style.display = 'inline-block';
+			document.getElementById('start-quiz-button').style.display = 'inline-block';        
+		};
 
-        function startQuiz() {
-            const questionCount = document.getElementById('question-count').value;
-            fetch(`https://quientecrea.pythonanywhere.com/api/v1/questions/${questionCount}`)
-                .then(response => response.json())
-                .then(data => {
-                    questions = data;
-                    currentQuestionIndex = 0;
-                    correctAnswersCount = 0;
-                    document.getElementById('quiz-container').style.display = 'block';
-                    document.getElementById('result-container').style.display = 'none';
-                    showQuestion();
-                });
-        }
+		function startQuiz() {
+			if (goalReached) {
+				resetCounters(); // Reset counters before starting a new quiz if the goal has been reached
+			}
 
-        function showQuestion() {
-            const questionData = questions[currentQuestionIndex];
-            document.getElementById('question-container').innerText = `Question: ${questionData.question}`;
-            document.getElementById('optionA').innerText = `A: ${questionData.option_A}`;
-            document.getElementById('optionB').innerText = `B: ${questionData.option_B}`;
-            document.getElementById('optionC').innerText = `C: ${questionData.option_C}`;
-            document.getElementById('optionD').innerText = `D: ${questionData.option_D}`;
-            document.getElementById('progress').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
-            clearButtonStyles();
-        }
+			const questionCount = document.getElementById('question-count').value;
+			fetch(`https://quientecrea.pythonanywhere.com/api/v1/questions/${questionCount}`)
+				.then(response => response.json())
+				.then(data => {
+					questions = data;
+					currentQuestionIndex = 0;
+					correctAnswersCount = 0;
+					document.getElementById('quiz-container').style.display = 'block';
+					document.getElementById('result-container').style.display = 'none';
+					showQuestion();
+				});
+		}
 
-        function clearButtonStyles() {
-            document.getElementById('optionA').classList.remove('correct-answer', 'incorrect-answer');
-            document.getElementById('optionB').classList.remove('correct-answer', 'incorrect-answer');
-            document.getElementById('optionC').classList.remove('correct-answer', 'incorrect-answer');
-            document.getElementById('optionD').classList.remove('correct-answer', 'incorrect-answer');
-        }
+		function showQuestion() {
+			const questionData = questions[currentQuestionIndex];
+			document.getElementById('question-container').innerText = `Question: ${questionData.question}`;
+			document.getElementById('optionA').innerText = `A: ${questionData.option_A}`;
+			document.getElementById('optionB').innerText = `B: ${questionData.option_B}`;
+			document.getElementById('optionC').innerText = `C: ${questionData.option_C}`;
+			document.getElementById('optionD').innerText = `D: ${questionData.option_D}`;
+			document.getElementById('progress').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+			clearButtonStyles();
+		}
 
-        function checkAnswer(selectedOption) {
-            const correctAnswer = questions[currentQuestionIndex].correct_answer;
-            const selectedButton = document.getElementById(`option${selectedOption}`);
-            const correctButton = document.getElementById(`option${correctAnswer}`);
+		function clearButtonStyles() {
+			document.getElementById('optionA').classList.remove('correct-answer', 'incorrect-answer');
+			document.getElementById('optionB').classList.remove('correct-answer', 'incorrect-answer');
+			document.getElementById('optionC').classList.remove('correct-answer', 'incorrect-answer');
+			document.getElementById('optionD').classList.remove('correct-answer', 'incorrect-answer');
+		}
 
-            if (selectedOption === correctAnswer) {
-                correctAnswersCount++;
-                selectedButton.classList.add('correct-answer');
-            } else {
-                selectedButton.classList.add('incorrect-answer');
-                correctButton.classList.add('correct-answer');
-            }
+		function checkAnswer(selectedOption) {
+			const correctAnswer = questions[currentQuestionIndex].correct_answer;
+			const selectedButton = document.getElementById(`option${selectedOption}`);
+			const correctButton = document.getElementById(`option${correctAnswer}`);
 
-            currentQuestionIndex++;
-            setTimeout(() => {
-                if (currentQuestionIndex < questions.length) {
-                    showQuestion();
-                } else {
-                    showResult();
-                }
-            }, 500); // Delay of 0.5 seconds
-        }
+			if (selectedOption === correctAnswer) {
+				selectedButton.classList.add('correct-answer');
+				correctAnswersCount++;
+			} else {
+				selectedButton.classList.add('incorrect-answer');
+				correctButton.classList.add('correct-answer');
+			}
 
-        function showResult() {
-            document.getElementById('quiz-container').style.display = 'none';
-            document.getElementById('result-container').style.display = 'block';
-            const successRate = (correctAnswersCount / questions.length) * 100;
-            document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct. Success rate: ${successRate.toFixed(2)}%`;
+			currentQuestionIndex++;
+			setTimeout(() => {
+				if (currentQuestionIndex < questions.length) {
+					showQuestion();
+				} else {
+					endQuiz();
+				}
+			}, 1000);
+		}
 
-            quizAttempts.push(successRate);
-            localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts));
+		function endQuiz() {
+			document.getElementById('quiz-container').style.display = 'none';
+			const score = (correctAnswersCount / questions.length) * 100;
+			quizAttempts.push(score);
+			localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts));
 
-            const successQuizzes = quizAttempts.filter(attempt => attempt >= threshold);
-            consecutiveSuccessfulQuizzes = successQuizzes.length;
+			if (score >= threshold) {
+				consecutiveSuccessfulQuizzes++;
+			} else {
+				consecutiveSuccessfulQuizzes = 0; // Reset consecutive passes if the score is below the threshold
+			}
 
-            if (consecutiveSuccessfulQuizzes >= minimumTimes) {
-                document.getElementById('goal-message').innerText = `Goal achieved! Success for ${consecutiveSuccessfulQuizzes} consecutive quizzes!`;
-            } else {
-                document.getElementById('goal-message').innerText = `Goal not achieved yet. Current streak: ${consecutiveSuccessfulQuizzes}`;
-            }
+			totalPasses = consecutiveSuccessfulQuizzes;
 
-            displayChart();
-        }
+			// Update the progress bar and message
+			updateProgressBar(totalPasses, minimumTimes);
+			document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct. Success rate: ${score.toFixed(2)}%`;
+			document.getElementById('result-container').style.display = 'block';
+			updateChart();
 
-        function displayChart() {
-            const ctx = document.getElementById('evolutionChart').getContext('2d');
-            if (chart) {
-                chart.destroy();
-            }
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: quizAttempts.map((_, i) => `Attempt ${i + 1}`),
-                    datasets: [{
-                        label: 'Success Rate (%)',
-                        data: quizAttempts,
-                        fill: false,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
-                    }]
-                }
-            });
-        }
+			// If the goal is reached, show a message
+			if (consecutiveSuccessfulQuizzes >= minimumTimes && !goalReached) {
+				goalReached = true; // Set the flag to indicate goal has been reached
+				document.getElementById('goal-message').innerText = `Goal reached! Progress: ${totalPasses} out of ${minimumTimes}`;
+			}
+		}
 
-        function clearHistory() {
-            localStorage.removeItem('quizAttempts');
-            quizAttempts = [];
-            consecutiveSuccessfulQuizzes = 0;
-            document.getElementById('goal-message').innerText = '';
-        }
-    </script>
+		function resetCounters() {
+			consecutiveSuccessfulQuizzes = 0; // Reset consecutive successful quizzes
+			totalPasses = 0; // Reset total passes
+			goalReached = false; // Reset goal reached flag
+			updateProgressBar(totalPasses, minimumTimes); // Reset progress bar
+			document.getElementById('goal-message').innerText = ""; // Clear goal message
+		}
+
+		function updateProgressBar(progress, goal) {
+			if (goal > 0) {
+				const percentage = (progress / goal) * 100;
+				document.getElementById('goal-progress-bar').style.width = `${percentage}%`;
+				document.getElementById('goal-message').innerText = `Progress: ${progress} out of ${goal}`;
+			}
+		}
+
+		function updateChart() {
+			const ctx = document.getElementById('evolutionChart').getContext('2d');
+			if (chart) chart.destroy();
+			chart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: quizAttempts.map((_, index) => `Attempt ${index + 1}`),
+					datasets: [{
+						label: 'Success Rate (%)',
+						data: quizAttempts,
+						borderColor: 'rgba(75, 192, 192, 1)',
+						borderWidth: 2,
+						fill: false,
+					}]
+				},
+				options: {
+					scales: {
+						y: {
+							beginAtZero: true,
+							max: 100
+						}
+					}
+				}
+			});
+		}
+
+		function clearHistory() {
+			localStorage.removeItem('quizAttempts');
+			quizAttempts = [];
+			updateChart();
+		}
+	</script>
 </body>
 </html>
