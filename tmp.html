@@ -118,18 +118,25 @@
             <button id="set-goal-button">Set Goal</button>
             <div id="goal-message"></div>
         </div>
+		<div id="setquiz-container"style="display:none;">
+			<select id="question-count">
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="20">20</option>
+				<option value="50">50</option>
+				<option value="100">100</option>
+				<option value="150">150</option>
+				<option value="180">180</option>
+			</select>
 
-        <p>Please select the number of questions you want to try:</p>
-        <select id="question-count" style="width: 100%; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-            <option value="150">150</option>
-            <option value="180">180</option>
-        </select>
-        <button onclick="startQuiz()" id="start-quiz-button" style="display:none;">Start Quiz</button>
+            <label for="questions_number">Questions:</label>           
+            
+            <button onclick="startQuiz()" id="start-quiz-button" style="display:none;">Start Quiz</button>
+			<button class="clear-history" onclick="clearHistory()" >Clear Data</button>
+            <div id="setquiz-message"></div>
+        </div>
+		
+		
         
         <div id="quiz-container">
             <div id="question-container" class="question"></div>
@@ -147,7 +154,7 @@
             <canvas id="evolutionChart"></canvas>
         </div>
 
-        <button class="clear-history" onclick="clearHistory()">Clear Historical Data</button>
+        
 
     </div>
 
@@ -168,7 +175,8 @@
 			consecutiveSuccessfulQuizzes = 0
             //document.getElementById('goal-container').style.display = 'none';
             //document.getElementById('goal-message').innerText = `Your goal is to pass the quiz ${minimumTimes} times with at least ${threshold}% consecutively.`;
-            document.getElementById('start-quiz-button').style.display = 'inline-block';
+           document.getElementById('setquiz-container').style.display = 'inline-block';
+		   document.getElementById('start-quiz-button').style.display = 'inline-block';		
         };
 
         function startQuiz() {
