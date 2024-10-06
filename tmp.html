@@ -80,65 +80,72 @@
             font-weight: bold;
             margin-top: 10px;
         }
+        .correct-answer {
+            background-color: #28a745 !important;
+            color: white;
+        }
+        .incorrect-answer {
+            background-color: #dc3545 !important;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>PMP Simulator</h1>
         <center>
-			<div id="goal-container">
-				<label for="threshold">Threshold:</label>
-				<select id="threshold">
-					<option value="10">10%</option>
-					<option value="20">20%</option>
-					<option value="30">30%</option>
-					<option value="40">40%</option>
-					<option value="50">50%</option>
-					<option value="60">60%</option>
-					<option value="70">70%</option>
-					<option value="80">80%</option>
-					<option value="90">90%</option>
-					<option value="95">95%</option>
-				</select>
+            <div id="goal-container">
+                <label for="threshold">Threshold:</label>
+                <select id="threshold">
+                    <option value="10">10%</option>
+                    <option value="20">20%</option>
+                    <option value="30">30%</option>
+                    <option value="40">40%</option>
+                    <option value="50">50%</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                    <option value="90">90%</option>
+                    <option value="95">95%</option>
+                </select>
 
-				<label for="minimum_times">Times:</label>
-				<select id="minimum_times">
-					<option value="1">1</option>
-					<option value="2">2</option>
-					<option value="3">3</option>
-					<option value="4">4</option>
-					<option value="5">5</option>
-					<option value="6">6</option>
-					<option value="7">7</option>
-					<option value="8">8</option>
-					<option value="9">9</option>
-					<option value="10">10</option>
-				</select>
-				
-				<button id="set-goal-button">Set Goal</button>
-				<div id="goal-message"></div>
-			</div>
-		</center>
-		<center>
-			<div id="setquiz-container"style="display:none; margin-bottom: 20px;">
-				<select id="question-count">
-					<option value="5">5</option>
-					<option value="10">10</option>
-					<option value="20">20</option>
-					<option value="50">50</option>
-					<option value="100">100</option>
-					<option value="150">150</option>
-					<option value="180">180</option>
-				</select>
+                <label for="minimum_times">Times:</label>
+                <select id="minimum_times">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+                
+                <button id="set-goal-button">Set Goal</button>
+                <div id="goal-message"></div>
+            </div>
+        </center>
+        <center>
+            <div id="setquiz-container" style="display:none; margin-bottom: 20px;">
+                <select id="question-count">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="150">150</option>
+                    <option value="180">180</option>
+                </select>
 
-				<label for="questions_number">Questions:</label>           
-				
-				<button onclick="startQuiz()" id="start-quiz-button" style="display:none;">Start Quiz</button>
-				<button class="clear-history" onclick="clearHistory()" >Clear Data</button>
-				<div id="setquiz-message"></div>
-			</div>
-		</center>
-		
+                <label for="questions_number">Questions:</label>           
+                
+                <button onclick="startQuiz()" id="start-quiz-button" style="display:none;">Start Quiz</button>
+                <button class="clear-history" onclick="clearHistory()">Clear Data</button>
+                <div id="setquiz-message"></div>
+            </div>
+        </center>
         
         <div id="quiz-container">
             <div id="question-container" class="question"></div>
@@ -156,8 +163,6 @@
             <canvas id="evolutionChart"></canvas>
         </div>
 
-        
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -169,16 +174,14 @@
         let chart; 
         let threshold = 0; 
         let minimumTimes = 0; 
-        let consecutiveSuccessfulQuizzes = 0; // Track consecutive successful quizzes
+        let consecutiveSuccessfulQuizzes = 0;
 
         document.getElementById('set-goal-button').onclick = function() {
             threshold = parseInt(document.getElementById('threshold').value);
             minimumTimes = parseInt(document.getElementById('minimum_times').value);
-			consecutiveSuccessfulQuizzes = 0
-            //document.getElementById('goal-container').style.display = 'none';
-            //document.getElementById('goal-message').innerText = `Your goal is to pass the quiz ${minimumTimes} times with at least ${threshold}% consecutively.`;
-           document.getElementById('setquiz-container').style.display = 'inline-block';
-		   document.getElementById('start-quiz-button').style.display = 'inline-block';		
+            consecutiveSuccessfulQuizzes = 0;
+            document.getElementById('setquiz-container').style.display = 'inline-block';
+            document.getElementById('start-quiz-button').style.display = 'inline-block';        
         };
 
         function startQuiz() {
@@ -203,82 +206,76 @@
             document.getElementById('optionC').innerText = `C: ${questionData.option_C}`;
             document.getElementById('optionD').innerText = `D: ${questionData.option_D}`;
             document.getElementById('progress').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            clearButtonStyles();
+        }
+
+        function clearButtonStyles() {
+            document.getElementById('optionA').classList.remove('correct-answer', 'incorrect-answer');
+            document.getElementById('optionB').classList.remove('correct-answer', 'incorrect-answer');
+            document.getElementById('optionC').classList.remove('correct-answer', 'incorrect-answer');
+            document.getElementById('optionD').classList.remove('correct-answer', 'incorrect-answer');
         }
 
         function checkAnswer(selectedOption) {
             const correctAnswer = questions[currentQuestionIndex].correct_answer;
+            const selectedButton = document.getElementById(`option${selectedOption}`);
+            const correctButton = document.getElementById(`option${correctAnswer}`);
+
             if (selectedOption === correctAnswer) {
                 correctAnswersCount++;
-            }
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                showQuestion();
+                selectedButton.classList.add('correct-answer');
             } else {
-                showResult();
+                selectedButton.classList.add('incorrect-answer');
+                correctButton.classList.add('correct-answer');
             }
+
+            currentQuestionIndex++;
+            setTimeout(() => {
+                if (currentQuestionIndex < questions.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 500); // Delay of 0.5 seconds
         }
 
         function showResult() {
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('result-container').style.display = 'block';
             const successRate = (correctAnswersCount / questions.length) * 100;
-            document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct!`;
+            document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct. Success rate: ${successRate.toFixed(2)}%`;
 
             quizAttempts.push(successRate);
-            localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts)); 
+            localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts));
 
-            if (successRate >= threshold) {
-                consecutiveSuccessfulQuizzes++; // Increment consecutive count on success
-            } else {
-                consecutiveSuccessfulQuizzes = 0; // Reset consecutive count on failure
-            }
+            const successQuizzes = quizAttempts.filter(attempt => attempt >= threshold);
+            consecutiveSuccessfulQuizzes = successQuizzes.length;
 
             if (consecutiveSuccessfulQuizzes >= minimumTimes) {
-                alert(`Congratulations! You've met your goal with ${minimumTimes} consecutive successes!`);
-                consecutiveSuccessfulQuizzes = 0; // Reset after meeting the goal
-                document.getElementById('goal-container').style.display = 'block'; // Prompt for new goal
+                document.getElementById('goal-message').innerText = `Goal achieved! Success for ${consecutiveSuccessfulQuizzes} consecutive quizzes!`;
             } else {
-                const remainingAttempts = minimumTimes - consecutiveSuccessfulQuizzes;
-                alert(`You need ${remainingAttempts} more consecutive successful quizzes to reach your goal.`);
+                document.getElementById('goal-message').innerText = `Goal not achieved yet. Current streak: ${consecutiveSuccessfulQuizzes}`;
             }
 
-            updateChart();
+            displayChart();
         }
 
-        function updateChart() {
+        function displayChart() {
             const ctx = document.getElementById('evolutionChart').getContext('2d');
             if (chart) {
-                chart.destroy(); // Clear the existing chart
+                chart.destroy();
             }
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: Array.from({ length: quizAttempts.length }, (_, i) => i + 1),
+                    labels: quizAttempts.map((_, i) => `Attempt ${i + 1}`),
                     datasets: [{
-                        label: 'Success Rate',
+                        label: 'Success Rate (%)',
                         data: quizAttempts,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 2,
-                        fill: false
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
                     }]
-                },
-                options: {
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Attempts'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Success Rate (%)'
-                            },
-                            beginAtZero: true,
-                            max: 100
-                        }
-                    }
                 }
             });
         }
@@ -286,7 +283,8 @@
         function clearHistory() {
             localStorage.removeItem('quizAttempts');
             quizAttempts = [];
-            updateChart(); // Refresh chart
+            consecutiveSuccessfulQuizzes = 0;
+            document.getElementById('goal-message').innerText = '';
         }
     </script>
 </body>
