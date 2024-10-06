@@ -85,57 +85,59 @@
 <body>
     <div class="container">
         <h1>PMP Simulator</h1>
-        
-        <div id="goal-container">
-            <label for="threshold">Threshold:</label>
-            <select id="threshold">
-                <option value="10">10%</option>
-                <option value="20">20%</option>
-                <option value="30">30%</option>
-                <option value="40">40%</option>
-                <option value="50">50%</option>
-                <option value="60">60%</option>
-                <option value="70">70%</option>
-                <option value="80">80%</option>
-                <option value="90">90%</option>
-                <option value="95">95%</option>
-            </select>
+        <center>
+			<div id="goal-container">
+				<label for="threshold">Threshold:</label>
+				<select id="threshold">
+					<option value="10">10%</option>
+					<option value="20">20%</option>
+					<option value="30">30%</option>
+					<option value="40">40%</option>
+					<option value="50">50%</option>
+					<option value="60">60%</option>
+					<option value="70">70%</option>
+					<option value="80">80%</option>
+					<option value="90">90%</option>
+					<option value="95">95%</option>
+				</select>
 
-            <label for="minimum_times">Times:</label>
-            <select id="minimum_times">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-            </select>
-            
-            <button id="set-goal-button">Set Goal</button>
-            <div id="goal-message"></div>
-        </div>
-		<div id="setquiz-container"style="display:none;">
-			<select id="question-count">
-				<option value="5">5</option>
-				<option value="10">10</option>
-				<option value="20">20</option>
-				<option value="50">50</option>
-				<option value="100">100</option>
-				<option value="150">150</option>
-				<option value="180">180</option>
-			</select>
+				<label for="minimum_times">Times:</label>
+				<select id="minimum_times">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+					<option value="6">6</option>
+					<option value="7">7</option>
+					<option value="8">8</option>
+					<option value="9">9</option>
+					<option value="10">10</option>
+				</select>
+				
+				<button id="set-goal-button">Set Goal</button>
+				<div id="goal-message"></div>
+			</div>
+		</center>
+		<center>
+			<div id="setquiz-container"style="display:none; margin-bottom: 20px;">
+				<select id="question-count">
+					<option value="5">5</option>
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="50">50</option>
+					<option value="100">100</option>
+					<option value="150">150</option>
+					<option value="180">180</option>
+				</select>
 
-            <label for="questions_number">Questions:</label>           
-            
-            <button onclick="startQuiz()" id="start-quiz-button" style="display:none;">Start Quiz</button>
-			<button class="clear-history" onclick="clearHistory()" >Clear Data</button>
-            <div id="setquiz-message"></div>
-        </div>
-		
+				<label for="questions_number">Questions:</label>           
+				
+				<button onclick="startQuiz()" id="start-quiz-button" style="display:none;">Start Quiz</button>
+				<button class="clear-history" onclick="clearHistory()" >Clear Data</button>
+				<div id="setquiz-message"></div>
+			</div>
+		</center>
 		
         
         <div id="quiz-container">
