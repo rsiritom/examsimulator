@@ -192,22 +192,42 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script>
-		let currentQuestionIndex = 0;
-		let correctAnswersCount = 0;
-		let questions = [];
+		let currentQuestionIndex = parseInt(localStorage.getItem('currentQuestionIndex')) || 0;
+		let correctAnswersCount = parseInt(localStorage.getItem('correctAnswersCount')) || 0;
+		let questions = JSON.parse(localStorage.getItem('questions')) || [];
 		let quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
 		let chart; 
-		let threshold = 0; 
-		let minimumTimes = 0; 
-		let consecutiveSuccessfulQuizzes = 0;
-		let totalPasses = 0; // Tracks the number of consecutive passes
-		let goalReached = false; // Tracks if the goal has been reached
+		let threshold = parseInt(localStorage.getItem('threshold')) || 0; 
+		let minimumTimes = parseInt(localStorage.getItem('minimumTimes')) || 0; 
+		let consecutiveSuccessfulQuizzes = parseInt(localStorage.getItem('consecutiveSuccessfulQuizzes')) || 0;
+		let totalPasses = parseInt(localStorage.getItem('totalPasses')) || 0;
+		let goalReached = JSON.parse(localStorage.getItem('goalReached')) || false;
+
+		window.onload = function() {
+			if (threshold && minimumTimes) {
+				document.getElementById('threshold').value = threshold;
+				document.getElementById('minimum_times').value = minimumTimes;
+				updateProgressBar(totalPasses, minimumTimes);
+			}
+			if (goalReached) {
+				document.getElementById('goal-message').innerText = `Goal reached! Progress: ${totalPasses} out of ${minimumTimes}`;
+			}
+			if (questions.length > 0) {
+				resumeQuiz(); // Resume quiz if questions exist
+			} else {
+				// Show buttons for starting a new quiz or clearing data if no questions exist
+				document.getElementById('setquiz-container').style.display = 'inline-block';
+				document.getElementById('start-quiz-button').style.display = 'inline-block';
+			}
+			updateChart();
+		};
 
 		document.getElementById('set-goal-button').onclick = function() {
 			threshold = parseInt(document.getElementById('threshold').value);
 			minimumTimes = parseInt(document.getElementById('minimum_times').value);
-			resetCounters(); // Reset counters when a new goal is set
-			//resetQuizAttempts(); // Clear previous quiz attempts to start fresh
+			localStorage.setItem('threshold', threshold);
+			localStorage.setItem('minimumTimes', minimumTimes);
+			resetCounters(); 
 			document.getElementById('setquiz-container').style.display = 'inline-block';
 			document.getElementById('start-quiz-button').style.display = 'inline-block';        
 		};
@@ -226,8 +246,18 @@
 					correctAnswersCount = 0;
 					document.getElementById('quiz-container').style.display = 'block';
 					document.getElementById('result-container').style.display = 'none';
+					document.getElementById('setquiz-container').style.display = 'none'; // Hide goal settings when the quiz starts
+					document.getElementById('start-quiz-button').style.display = 'none'; // Hide the start quiz button when the quiz starts
+					localStorage.setItem('questions', JSON.stringify(questions));
+					localStorage.setItem('currentQuestionIndex', currentQuestionIndex);
+					localStorage.setItem('correctAnswersCount', correctAnswersCount);
 					showQuestion();
 				});
+		}
+
+		function resumeQuiz() {
+			document.getElementById('quiz-container').style.display = 'block';
+			showQuestion();
 		}
 
 		function showQuestion() {
@@ -239,6 +269,7 @@
 			document.getElementById('optionD').innerText = `D: ${questionData.option_D}`;
 			document.getElementById('progress').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
 			clearButtonStyles();
+			restoreAnswerSelection();
 		}
 
 		function clearButtonStyles() {
@@ -262,6 +293,9 @@
 			}
 
 			currentQuestionIndex++;
+			localStorage.setItem('currentQuestionIndex', currentQuestionIndex);
+			localStorage.setItem('correctAnswersCount', correctAnswersCount);
+
 			setTimeout(() => {
 				if (currentQuestionIndex < questions.length) {
 					showQuestion();
@@ -276,6 +310,9 @@
 			const score = (correctAnswersCount / questions.length) * 100;
 			quizAttempts.push(score);
 			localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts));
+			localStorage.removeItem('questions');
+			localStorage.removeItem('currentQuestionIndex');
+			localStorage.removeItem('correctAnswersCount');
 
 			if (score >= threshold) {
 				consecutiveSuccessfulQuizzes++;
@@ -284,35 +321,42 @@
 			}
 
 			totalPasses = consecutiveSuccessfulQuizzes;
+			localStorage.setItem('consecutiveSuccessfulQuizzes', consecutiveSuccessfulQuizzes);
+			localStorage.setItem('totalPasses', totalPasses);
 
-			// Update the progress bar and message
 			updateProgressBar(totalPasses, minimumTimes);
 			document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct. Success rate: ${score.toFixed(2)}%`;
 			document.getElementById('result-container').style.display = 'block';
 			updateChart();
 
-			// If the goal is reached, show a message
 			if (consecutiveSuccessfulQuizzes >= minimumTimes && !goalReached) {
-				goalReached = true; // Set the flag to indicate goal has been reached
+				goalReached = true;
+				localStorage.setItem('goalReached', JSON.stringify(goalReached));
 				document.getElementById('goal-message').innerText = `Goal reached! Progress: ${totalPasses} out of ${minimumTimes}`;
 			}
+
+			document.getElementById('setquiz-container').style.display = 'inline-block'; // Show goal settings after quiz ends
+			document.getElementById('start-quiz-button').style.display = 'inline-block'; // Show start quiz button after quiz ends
 		}
 
 		function resetCounters() {
-			consecutiveSuccessfulQuizzes = 0; // Reset consecutive successful quizzes
-			totalPasses = 0; // Reset total passes
-			goalReached = false; // Reset goal reached flag
-			updateProgressBar(totalPasses, minimumTimes); // Reset progress bar
-			document.getElementById('goal-message').innerText = ""; // Clear goal message
+			consecutiveSuccessfulQuizzes = 0; 
+			totalPasses = 0;
+			goalReached = false; 
+			localStorage.setItem('consecutiveSuccessfulQuizzes', consecutiveSuccessfulQuizzes);
+			localStorage.setItem('totalPasses', totalPasses);
+			localStorage.setItem('goalReached', JSON.stringify(goalReached));
+			updateProgressBar(totalPasses, minimumTimes);
+			document.getElementById('goal-message').innerText = "";
 		}
 
 		function updateProgressBar(progress, goal) {
 			if (goal > 0) {
-				const percentage = (progress / goal) * 100; // Calculate percentage
-				document.getElementById('goal-progress-bar').style.width = `${percentage}%`; // Apply the width
+				const percentage = (progress / goal) * 100; 
+				document.getElementById('goal-progress-bar').style.width = `${percentage}%`; 
 				document.getElementById('goal-message').innerText = `Progress: ${progress} out of ${goal}`;
 			} else {
-				document.getElementById('goal-progress-bar').style.width = '0%'; // Set to 0% if no goal
+				document.getElementById('goal-progress-bar').style.width = '0%'; 
 			}
 		}
 
@@ -343,27 +387,58 @@
 		}
 		
 		function resetQuizAttempts() {
-			quizAttempts = []; // Clear the previous quiz attempts
-			localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts)); // Update local storage
-			updateChart(); // Reflect the cleared data in the chart
+			quizAttempts = [];
+			localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts)); 
+			updateChart(); 
 		}
 
 		function clearHistory() {
 			localStorage.removeItem('quizAttempts');
-			quizAttempts = [];
-			threshold = 0; // Reset threshold
-			minimumTimes = 0; // Reset minimum times
-			consecutiveSuccessfulQuizzes = 0; // Reset consecutive successful quizzes
-			goalReached = false; // Reset goal reached status
+			localStorage.removeItem('threshold');
+			localStorage.removeItem('minimumTimes');
+			localStorage.removeItem('consecutiveSuccessfulQuizzes');
+			localStorage.removeItem('totalPasses');
+			localStorage.removeItem('goalReached');
+			localStorage.removeItem('questions');
+			localStorage.removeItem('currentQuestionIndex');
+			localStorage.removeItem('correctAnswersCount');
 
-			// Reset the UI elements
-			document.getElementById('goal-message').innerText = ""; // Clear goal message
-			document.getElementById('goal-progress-bar').style.width = '0%'; // Reset progress bar visually
-			updateProgressBar(totalPasses, minimumTimes); // Reset progress bar values
-			document.getElementById('threshold').value = "10"; // Reset threshold dropdown to default value
-			document.getElementById('minimum_times').value = "1"; // Reset minimum times dropdown to default value
-			updateChart(); // Update chart to reflect cleared data
+			quizAttempts = [];
+			threshold = 0;
+			minimumTimes = 0;
+			consecutiveSuccessfulQuizzes = 0;
+			totalPasses = 0;
+			goalReached = false;
+
+			updateProgressBar(totalPasses, minimumTimes);
+			updateChart();
+
+			// Show goal settings and start quiz button again
+			document.getElementById('setquiz-container').style.display = 'inline-block';
+			document.getElementById('start-quiz-button').style.display = 'inline-block';
+			document.getElementById('clear-history-button').style.display = 'none'; // Hide clear data button after clearing
 		}
+
+		function restoreAnswerSelection() {
+			const questionData = questions[currentQuestionIndex];
+			const correctAnswer = questionData.correct_answer;
+
+			['A', 'B', 'C', 'D'].forEach(option => {
+				const button = document.getElementById(`option${option}`);
+				if (button.classList.contains('correct-answer') || button.classList.contains('incorrect-answer')) {
+					button.classList.remove('correct-answer', 'incorrect-answer');
+				}
+			});
+		}
+
+		document.getElementById('start-quiz-button').onclick = startQuiz;
+
+		document.getElementById('optionA').onclick = () => checkAnswer('A');
+		document.getElementById('optionB').onclick = () => checkAnswer('B');
+		document.getElementById('optionC').onclick = () => checkAnswer('C');
+		document.getElementById('optionD').onclick = () => checkAnswer('D');
 	</script>
+
+
 </body>
 </html>
