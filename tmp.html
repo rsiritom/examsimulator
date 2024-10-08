@@ -159,13 +159,13 @@
                 <label for="questions_number">Questions:</label>           
                 
                 <button onclick="startQuiz()" id="start-quiz-button" style="display:none;">Start Quiz</button>
-                <button class="clear-history" onclick="clearHistory()">Clear Data</button>
+                <button id="clear-history-button" class="clear-history" onclick="clearHistory()">Clear Data</button>
                 <div id="setquiz-message"></div>
             </div>
-			<div class="goal-message-container">
+			<div id="goal-message-container-div" class="goal-message-container">
 				<div id="goal-message"></div>
 			</div>
-			<div class="progress-bar-container">
+			<div id="progress-bar-container-div" class="progress-bar-container">
 				<div id="goal-progress-bar" class="progress-bar"></div>
 			</div>
         </center>
@@ -204,23 +204,59 @@
 		let goalReached = JSON.parse(localStorage.getItem('goalReached')) || false;
 
 		window.onload = function() {
+			const savedQuestionCount = localStorage.getItem('questionCount');
+			
+			// Initially hide the progress bar container
+			document.getElementById('progress-bar-container-div').style.display = 'none';
+
+			// Check if there are any previously set thresholds and minimum times
+			if (threshold && minimumTimes) {
+				updateProgressBar(totalPasses, minimumTimes);
+				// Show the progress bar if necessary
+				document.getElementById('progress-bar-container-div').style.display = 'block'; 
+			}
+
+			if (savedQuestionCount) {
+				document.getElementById('question-count').value = savedQuestionCount;
+			}
+			
 			if (threshold && minimumTimes) {
 				document.getElementById('threshold').value = threshold;
 				document.getElementById('minimum_times').value = minimumTimes;
 				updateProgressBar(totalPasses, minimumTimes);
 			}
-			if (goalReached) {
-				document.getElementById('goal-message').innerText = `Goal reached! Progress: ${totalPasses} out of ${minimumTimes}`;
-			}
-			if (questions.length > 0) {
-				resumeQuiz(); // Resume quiz if questions exist
+
+			// Show goal container and message if the quiz has ended
+			if (goalReached || questions.length === 0) {
+				document.getElementById('goal-container').style.display = 'block';
+				document.getElementById('goal-message-container-div').style.display = 'block';
+				document.getElementById('progress-bar-container-div').style.display = 'block';
 			} else {
-				// Show buttons for starting a new quiz or clearing data if no questions exist
+				// Hide goal and progress containers if a quiz is ongoing
+				document.getElementById('goal-container').style.display = 'none';
+				document.getElementById('goal-message-container-div').style.display = 'none';
+				document.getElementById('progress-bar-container-div').style.display = 'none';
+			}
+
+			// Resume the quiz if it's still ongoing
+			if (questions.length > 0 && currentQuestionIndex < questions.length) {
+				resumeQuiz(); // Resume quiz if there are remaining questions
+			} else {
+				// Show goal settings and start quiz button if no quiz is ongoing
 				document.getElementById('setquiz-container').style.display = 'inline-block';
 				document.getElementById('start-quiz-button').style.display = 'inline-block';
+
+				// Show chart only if no quiz is in progress
+				if (quizAttempts.length > 0) {
+					updateChart(); // Update the chart if there is quiz data
+					document.getElementById('result-container').style.display = 'block'; // Show the result container with the chart
+					document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct.`; // Show 
+				}
 			}
-			updateChart();
 		};
+
+
+
 
 		document.getElementById('set-goal-button').onclick = function() {
 			threshold = parseInt(document.getElementById('threshold').value);
@@ -238,6 +274,8 @@
 			}
 
 			const questionCount = document.getElementById('question-count').value;
+			localStorage.setItem('questionCount', questionCount);
+			
 			fetch(`https://quientecrea.pythonanywhere.com/api/v1/questions/${questionCount}`)
 				.then(response => response.json())
 				.then(data => {
@@ -246,8 +284,12 @@
 					correctAnswersCount = 0;
 					document.getElementById('quiz-container').style.display = 'block';
 					document.getElementById('result-container').style.display = 'none';
+					document.getElementById('progress-bar-container-div').style.display = 'none';
+					document.getElementById('goal-message-container-div').style.display = 'none';
+					document.getElementById('goal-container').style.display = 'none';
 					document.getElementById('setquiz-container').style.display = 'none'; // Hide goal settings when the quiz starts
 					document.getElementById('start-quiz-button').style.display = 'none'; // Hide the start quiz button when the quiz starts
+					document.querySelector('.clear-history').style.display = 'inline-block'; // Show the clear data button
 					localStorage.setItem('questions', JSON.stringify(questions));
 					localStorage.setItem('currentQuestionIndex', currentQuestionIndex);
 					localStorage.setItem('correctAnswersCount', correctAnswersCount);
@@ -325,6 +367,10 @@
 			localStorage.setItem('totalPasses', totalPasses);
 
 			updateProgressBar(totalPasses, minimumTimes);
+			document.getElementById('progress-bar-container-div').style.display = 'block'; // 
+			document.getElementById('goal-message-container-div').style.display = 'block';
+			document.getElementById('goal-container').style.display = 'block';
+			
 			document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct. Success rate: ${score.toFixed(2)}%`;
 			document.getElementById('result-container').style.display = 'block';
 			updateChart();
