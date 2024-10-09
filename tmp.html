@@ -17,6 +17,23 @@
 			margin-top: 20px; /* Optional: Add some space above */
 			gap: 20px; /* Add gap between buttons */
 		}
+		
+		button {
+            margin-top: 10px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #f2f2f2;
+           	color: #000000;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+			font-family: 'Montserrat', sans-serif;
+			font-style: italic; 
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #b3b3b3;
+        }
 
         .container {
             width: 90%;
@@ -32,27 +49,18 @@
             margin-bottom: 20px;
         }
         .question {
+			font-size: 18px;
             margin-bottom: 20px;
+			text-align: center; 
         }
         .options {
-            margin-bottom: 20px;
+            font-size: 12px;
+			margin-bottom: 20px;
             display: flex;
             flex-direction: column;
         }
-        button {
-            margin-top: 10px;
-            padding: 10px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
+		
+ 
         .result {
             font-size: 1.5em;
             font-weight: bold;
@@ -69,6 +77,30 @@
 		#abort-button {
 			margin-left: 20px; /* Add space to the left of the "Abort" button */
 		}
+
+		#explanation-container {
+			background-color: #f9f9f9; /* Light background color for contrast */
+			border: 1px solid #ddd; /* Light border */
+			padding: 15px; /* Padding inside the container */
+			border-radius: 5px; /* Rounded corners */
+			margin: 20px 0; /* Margin above and below the container */
+			font-family: 'Poppins', sans-serif; /* Font family */
+			font-style: italic; 
+		}
+		
+		#explanation-container p {
+            font-size: 16px; 
+            color: #333; 
+        }
+
+        #explanation-container strong {
+            color: #000; 
+        }
+
+        #explanation-container #explanation-text {
+            color: #555; 
+            font-style: italic; 
+        }
 
         #result-container {
             margin-top: 20px;
@@ -209,6 +241,9 @@
 				<button id="abort-button" onclick="abortQuiz()">Abort</button>
 			</div>
         </div>
+		<div id="explanation-container">
+			<p><strong>Explanation:</strong> <span id="explanation-text"></span></p>
+		</div>
 
         <div id="result-container">
             <p class="result" id="result"></p>
@@ -234,7 +269,9 @@
 
 		window.onload = function() {
 			const savedQuestionCount = localStorage.getItem('questionCount');
-			
+						
+			document.getElementById('explanation-container').style.display = 'none';
+
 			// Initially hide the progress bar container
 			document.getElementById('progress-bar-container-div').style.display = 'none';
 
@@ -333,7 +370,7 @@
 
 		function showQuestion() {
 			const questionData = questions[currentQuestionIndex];
-			document.getElementById('question-container').innerText = `Question: ${questionData.question}`;
+			document.getElementById('question-container').innerText = `${questionData.question}`;
 			document.getElementById('optionA').innerText = `A: ${questionData.option_A}`;
 			document.getElementById('optionB').innerText = `B: ${questionData.option_B}`;
 			document.getElementById('optionC').innerText = `C: ${questionData.option_C}`;
@@ -382,6 +419,10 @@
 				selectedButton.classList.add('incorrect-answer');
 				correctButton.classList.add('correct-answer');
 			}
+			
+			// Show the explanation for the current question
+            document.getElementById('explanation-text').innerText = questions[currentQuestionIndex].explanation || 'No explanation available.';
+            document.getElementById('explanation-container').style.display = 'block';
 
 			// Show the "Next" button
 			document.getElementById('next-button').style.display = 'inline-block';
@@ -393,6 +434,7 @@
 		}
 		
 		function nextQuestion() {
+			document.getElementById('explanation-container').style.display = 'none';
 			currentQuestionIndex++;
 			
 			// Clear the selected option from localStorage
@@ -483,10 +525,11 @@
 					labels: quizAttempts.map((_, index) => `Attempt ${index + 1}`),
 					datasets: [{
 						label: 'Success Rate (%)',
-						data: quizAttempts,
-						borderColor: 'rgba(75, 192, 192, 1)',
-						borderWidth: 2,
-						fill: false,
+                        data: quizAttempts,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        fill: true,
+                        tension: 0.3,
 					}]
 				},
 				options: {
