@@ -15,7 +15,6 @@
 			display: flex;
 			justify-content: center;
 			margin-top: 20px; /* Optional: Add some space above */
-			gap: 20px; /* Add gap between buttons */
 		}
 
         .container {
@@ -61,15 +60,6 @@
         #quiz-container {
             display: none;
         }
-		
-		#next-button {
-			margin-right: 20px; /* Add space to the right of the "Next" button */
-		}
-
-		#abort-button {
-			margin-left: 20px; /* Add space to the left of the "Abort" button */
-		}
-
         #result-container {
             margin-top: 20px;
             display: none;
@@ -91,15 +81,6 @@
         #goal-container {
             margin-bottom: 20px;
         }
-		
-		#abort-button {
-			background-color: #dc3545; /* Red color */
-		}
-
-		#abort-button:hover {
-			background-color: #c82333; /* Darker red on hover */
-		}
-
         #goal-message {
             text-align: right;
             font-weight: bold;
@@ -206,10 +187,6 @@
             <p id="progress"></p>
 			<div class="button-container">
 				<button id="next-button" style="display:none;" onclick="nextQuestion()">Next</button>
-				<button id="abort-button" onclick="abortQuiz()">Abort</button>
-			</div>
-			<div id="explanation-container" style="display:none; margin-top: 20px;">
-				<p id="explanation-text"></p>
 			</div>
         </div>
 
@@ -369,13 +346,11 @@
 			document.getElementById('optionD').classList.remove('correct-answer', 'incorrect-answer');
 		}
 
-		function 	(selectedOption) {
-			const questionData = questions[currentQuestionIndex];
-			const correctAnswer = questionData.correct_answer;
+		function checkAnswer(selectedOption) {
+			const correctAnswer = questions[currentQuestionIndex].correct_answer;
 			const selectedButton = document.getElementById(`option${selectedOption}`);
 			const correctButton = document.getElementById(`option${correctAnswer}`);
-			const explanation = questionData.explanation;
-			
+
 			// Save the selected option in localStorage
 			localStorage.setItem(`selectedOption_${currentQuestionIndex}`, selectedOption);
 	
@@ -503,31 +478,6 @@
 					}
 				}
 			});
-		}
-		
-		function abortQuiz() {
-			// Reset all quiz-related localStorage
-			localStorage.removeItem('questions');
-			localStorage.removeItem('currentQuestionIndex');
-			localStorage.removeItem('correctAnswersCount');
-
-			// Reset global variables
-			currentQuestionIndex = 0;
-			correctAnswersCount = 0;
-			questions = [];
-
-			// Hide the quiz container and show the goal settings again
-			document.getElementById('quiz-container').style.display = 'none';
-			document.getElementById('setquiz-container').style.display = 'inline-block'; // Show goal settings
-			document.getElementById('start-quiz-button').style.display = 'inline-block'; // Show start quiz button
-			document.getElementById('goal-container').style.display = 'block'; 
-
-			// Optionally reset the progress bar and other UI elements
-			updateProgressBar(totalPasses, minimumTimes);
-			
-			// Reset any UI messages related to the quiz or progress
-			document.getElementById('goal-message-container-div').style.display = 'none'; // Hide the goal message
-			document.getElementById('result-container').style.display = 'none'; // Hide the result container
 		}
 		
 		function resetQuizAttempts() {
