@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agile Quiz</title>
+    <title>PMP Simulator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,6 +11,30 @@
             padding: 0;
             background-color: #f9f9f9;
         }
+		.button-container {
+			display: flex;
+			justify-content: center;
+			margin-top: 20px; /* Optional: Add some space above */
+			gap: 20px; /* Add gap between buttons */
+		}
+		
+		button {
+            margin-top: 10px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #f2f2f2;
+           	color: #000000;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+			font-family: 'Montserrat', sans-serif;
+			font-style: italic; 
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #b3b3b3;
+        }
+
         .container {
             width: 90%;
             max-width: 600px;
@@ -25,27 +49,18 @@
             margin-bottom: 20px;
         }
         .question {
+			font-size: 18px;
             margin-bottom: 20px;
+			text-align: center; 
         }
         .options {
-            margin-bottom: 20px;
+            font-size: 12px;
+			margin-bottom: 20px;
             display: flex;
             flex-direction: column;
         }
-        button {
-            margin-top: 10px;
-            padding: 10px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
+		
+ 
         .result {
             font-size: 1.5em;
             font-weight: bold;
@@ -54,6 +69,39 @@
         #quiz-container {
             display: none;
         }
+		
+		#next-button {
+			margin-right: 20px; /* Add space to the right of the "Next" button */
+		}
+
+		#abort-button {
+			margin-left: 20px; /* Add space to the left of the "Abort" button */
+		}
+
+		#explanation-container {
+			background-color: #f9f9f9; /* Light background color for contrast */
+			border: 1px solid #ddd; /* Light border */
+			padding: 15px; /* Padding inside the container */
+			border-radius: 5px; /* Rounded corners */
+			margin: 20px 0; /* Margin above and below the container */
+			font-family: 'Poppins', sans-serif; /* Font family */
+			font-style: italic; 
+		}
+		
+		#explanation-container p {
+            font-size: 16px; 
+            color: #333; 
+        }
+
+        #explanation-container strong {
+            color: #000; 
+        }
+
+        #explanation-container #explanation-text {
+            color: #555; 
+            font-style: italic; 
+        }
+
         #result-container {
             margin-top: 20px;
             display: none;
@@ -66,29 +114,117 @@
             margin-top: 20px;
             max-width: 100%;
         }
-        /* New button styling for clearing history */
         button.clear-history {
             background-color: #dc3545;
         }
         button.clear-history:hover {
             background-color: #c82333;
         }
+        #goal-container {
+            margin-bottom: 20px;
+        }
+		
+		#abort-button {
+			background-color: #dc3545; /* Red color */
+		}
+
+		#abort-button:hover {
+			background-color: #c82333; /* Darker red on hover */
+		}
+
+        #goal-message {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .progress-bar-container {
+			width: 100%;
+			background-color: #e0e0e0;
+			border-radius: 10px;
+			height: 20px;
+			overflow: hidden;
+		}
+        .progress-bar {
+			height: 100%;
+			background-color: #28a745; /* Green color */
+			width: 0; /* Starts from 0% width */
+			transition: width 0.3s ease;
+			border-top-left-radius: 10px; /* Rounded left side */
+			border-bottom-left-radius: 10px;
+			border-top-right-radius: 0; /* Flat right side */
+			border-bottom-right-radius: 0;
+		}
+        .correct-answer {
+            background-color: #28a745 !important;
+            color: white;
+        }
+        .incorrect-answer {
+            background-color: #dc3545 !important;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Agile Quiz</h1>
-        <p>Please select the number of questions you want to try:</p>
-        <select id="question-count" style="width: 100%; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-            <option value="150">150</option>
-            <option value="180">180</option>
-        </select>
-        <button onclick="startQuiz()">Start Quiz</button>
+        <h1>PMP Simulator</h1>
+        <center>
+            <div id="goal-container">
+                <label for="threshold">Threshold:</label>
+                <select id="threshold">
+                    <option value="10">10%</option>
+                    <option value="20">20%</option>
+                    <option value="30">30%</option>
+                    <option value="40">40%</option>
+                    <option value="50">50%</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                    <option value="90">90%</option>
+                    <option value="95">95%</option>
+                </select>
+
+                <label for="minimum_times">Times:</label>
+                <select id="minimum_times">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+                
+                <button id="set-goal-button">Set Goal</button>
+                
+            </div>
+        </center>
+        <center>
+            <div id="setquiz-container" style="display:none; margin-bottom: 20px;">
+                <select id="question-count">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="150">150</option>
+                    <option value="180">180</option>
+                </select>
+
+                <label for="questions_number">Questions:</label>           
+                <button id="start-quiz-button" style="display:none;">Start Quiz</button>
+                <button id="clear-history-button" class="clear-history" onclick="clearHistory()">Clear Data</button>
+                <div id="setquiz-message"></div>
+            </div>
+			<div id="goal-message-container-div" class="goal-message-container">
+				<div id="goal-message"></div>
+			</div>
+			<div id="progress-bar-container-div" class="progress-bar-container">
+				<div id="goal-progress-bar" class="progress-bar"></div>
+			</div>
+        </center>
         
         <div id="quiz-container">
             <div id="question-container" class="question"></div>
@@ -99,132 +235,232 @@
                 <button id="optionD" onclick="checkAnswer('D')"></button>
             </div>
             <p id="progress"></p>
+			<div class="button-container">
+				<button id="next-button" style="display:none;" onclick="nextQuestion()">Next</button>
+				<button id="abort-button" onclick="abortQuiz()">Abort</button>
+			</div>
         </div>
+		<div id="explanation-container">
+			<p><strong>Explanation:</strong> <span id="explanation-text"></span></p>
+		</div>
 
         <div id="result-container">
             <p class="result" id="result"></p>
             <canvas id="evolutionChart"></canvas>
         </div>
 
-        <!-- New button to clear historical data -->
-        <button class="clear-history" onclick="clearHistory()">Clear Historical Data</button>
+
 
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        let currentQuestionIndex = 0;
-        let correctAnswersCount = 0;
-        let questions = [];
-        let quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || []; // Retrieve previous quiz attempts from localStorage
-        let chart; // Global chart variable
+	<script>
+		let currentQuestionIndex = parseInt(localStorage.getItem('currentQuestionIndex')) || 0;
+		let correctAnswersCount = parseInt(localStorage.getItem('correctAnswersCount')) || 0;
+		let questions = JSON.parse(localStorage.getItem('questions')) || [];
+		let quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
+		let chart; 
+		let threshold = parseInt(localStorage.getItem('threshold')) || 0; 
+		let minimumTimes = parseInt(localStorage.getItem('minimumTimes')) || 0; 
+		let consecutiveSuccessfulQuizzes = parseInt(localStorage.getItem('consecutiveSuccessfulQuizzes')) || 0;
+		let totalPasses = parseInt(localStorage.getItem('totalPasses')) || 0;
+		let goalReached = JSON.parse(localStorage.getItem('goalReached')) || false;
 
-        // Function to start the quiz and fetch questions
-        function startQuiz() {
-            const questionCount = document.getElementById('question-count').value;
-            fetch(`https://quientecrea.pythonanywhere.com/api/v1/questions/${questionCount}`)
-                .then(response => response.json())
-                .then(data => {
-                    questions = data;
-                    currentQuestionIndex = 0;
-                    correctAnswersCount = 0;
-                    document.getElementById('quiz-container').style.display = 'block';
-                    document.getElementById('result-container').style.display = 'none';
-                    showQuestion();
-                });
+		window.onload = function() {
+			const savedQuestionCount = localStorage.getItem('questionCount');
+						
+			document.getElementById('explanation-container').style.display = 'none';
+
+			// Initially hide the progress bar container
+			document.getElementById('progress-bar-container-div').style.display = 'none';
+
+			// Check if there are any previously set thresholds and minimum times
+			if (threshold && minimumTimes) {
+				updateProgressBar(totalPasses, minimumTimes);
+				// Show the progress bar if necessary
+				document.getElementById('progress-bar-container-div').style.display = 'block'; 
+			}
+
+			if (savedQuestionCount) {
+				document.getElementById('question-count').value = savedQuestionCount;
+			}
+			
+			if (threshold && minimumTimes) {
+				document.getElementById('threshold').value = threshold;
+				document.getElementById('minimum_times').value = minimumTimes;
+				updateProgressBar(totalPasses, minimumTimes);
+			}
+
+			// Show goal container and message if the quiz has ended
+			if (goalReached || questions.length === 0) {
+				document.getElementById('goal-container').style.display = 'block';
+				document.getElementById('goal-message-container-div').style.display = 'block';
+				document.getElementById('progress-bar-container-div').style.display = 'block';
+			}
+
+			// Resume the quiz if it's still ongoing
+			if (questions.length > 0 && currentQuestionIndex < questions.length) {
+				resumeQuiz(); // Resume quiz if there are remaining questions
+			} else {
+				// Show goal settings and start quiz button if no quiz is ongoing
+				document.getElementById('setquiz-container').style.display = 'inline-block';
+				document.getElementById('start-quiz-button').style.display = 'inline-block';
+
+				// Show chart only if no quiz is in progress
+				if (quizAttempts.length > 0) {
+					updateChart(); // Update the chart if there is quiz data
+					document.getElementById('result-container').style.display = 'block'; // Show the result container with the chart
+					document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct.`; // Show 
+				}
+			}
+		};
+
+
+
+
+		document.getElementById('set-goal-button').onclick = function() {
+			threshold = parseInt(document.getElementById('threshold').value);
+			minimumTimes = parseInt(document.getElementById('minimum_times').value);
+			localStorage.setItem('threshold', threshold);
+			localStorage.setItem('minimumTimes', minimumTimes);
+			resetCounters(); 
+			document.getElementById('setquiz-container').style.display = 'inline-block';
+			document.getElementById('start-quiz-button').style.display = 'inline-block';        
+		};
+
+	
+		function resumeQuiz() {
+			document.getElementById('quiz-container').style.display = 'block';
+			showQuestion();
+		}
+
+
+	
+		function resetCounters() {
+			consecutiveSuccessfulQuizzes = 0; 
+			totalPasses = 0;
+			goalReached = false; 
+			localStorage.setItem('consecutiveSuccessfulQuizzes', consecutiveSuccessfulQuizzes);
+			localStorage.setItem('totalPasses', totalPasses);
+			localStorage.setItem('goalReached', JSON.stringify(goalReached));
+			updateProgressBar(totalPasses, minimumTimes);
+			document.getElementById('goal-message').innerText = "";
+		}
+
+		function updateProgressBar(progress, goal) {
+			if (goal > 0) {
+				const percentage = (progress / goal) * 100; 
+				document.getElementById('goal-progress-bar').style.width = `${percentage}%`; 
+				document.getElementById('goal-message').innerText = `Progress: ${progress} out of ${goal}`;
+			} else {
+				document.getElementById('goal-progress-bar').style.width = '0%'; 
+			}
+		}
+
+		function updateChart() {
+			const ctx = document.getElementById('evolutionChart').getContext('2d');
+			if (chart) chart.destroy();
+			chart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: quizAttempts.map((_, index) => `Attempt ${index + 1}`),
+					datasets: [{
+						label: 'Success Rate (%)',
+                        data: quizAttempts,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+					}]
+				},
+				options: {
+					scales: {
+						y: {
+							beginAtZero: true,
+							max: 100
+						}
+					}
+				}
+			});
+		}
+		
+		
+
+
+		function clearHistory() {
+			localStorage.removeItem('quizAttempts');
+			localStorage.removeItem('threshold');
+			localStorage.removeItem('minimumTimes');
+			localStorage.removeItem('consecutiveSuccessfulQuizzes');
+			localStorage.removeItem('totalPasses');
+			localStorage.removeItem('goalReached');
+			localStorage.removeItem('questions');
+			localStorage.removeItem('currentQuestionIndex');
+			localStorage.removeItem('correctAnswersCount');
+
+			quizAttempts = [];
+			threshold = 0;
+			minimumTimes = 0;
+			consecutiveSuccessfulQuizzes = 0;
+			totalPasses = 0;
+			goalReached = false;
+
+			updateProgressBar(totalPasses, minimumTimes);
+			updateChart();
+
+			// Show goal settings and start quiz button again
+			document.getElementById('setquiz-container').style.display = 'inline-block';
+			document.getElementById('start-quiz-button').style.display = 'inline-block';
+			document.getElementById('clear-history-button').style.display = 'none'; // Hide clear data button after clearing
+		}
+
+		function restoreAnswerSelection() {
+			const savedOption = localStorage.getItem(`selectedOption_${currentQuestionIndex}`);
+			const correctAnswer = questions[currentQuestionIndex].correct_answer;
+
+			// Clear previous styles
+			clearButtonStyles();
+
+			if (savedOption) {
+				const selectedButton = document.getElementById(`option${savedOption}`);
+				
+				if (savedOption === correctAnswer) {
+					selectedButton.classList.add('correct-answer'); // Indicate the selected option as correct
+				} else {
+					selectedButton.classList.add('incorrect-answer'); // Indicate the selected option as incorrect
+					const correctButton = document.getElementById(`option${correctAnswer}`);
+					correctButton.classList.add('correct-answer'); // Show the correct answer
+				}
+				
+				disableOptionButtons(); // Disable the buttons since an option is already selected
+				document.getElementById('next-button').style.display = 'inline-block'; // Show the "Next" button
+			} else {
+				enableOptionButtons(); // If no option is selected, enable all buttons
+			}
+		}
+		
+		function beforeRedirect() {
+            console.log("Executing function before redirecting...");
+            // Perform any required actions here, like saving data or displaying a message
+            //localStorage.setItem('threshold', 70); // Example action
+			const questionCount = document.getElementById('question-count').value;
+			localStorage.setItem('questionCount', questionCount);
+
+            // Once the function completes, redirect to the other page
+            window.location.href = 'test.html';
         }
 
-        // Function to display the current question
-        function showQuestion() {
-            const questionData = questions[currentQuestionIndex];
-            document.getElementById('question-container').innerText = `Question: ${questionData.question}`;
-            document.getElementById('optionA').innerText = `A: ${questionData.option_A}`;
-            document.getElementById('optionB').innerText = `B: ${questionData.option_B}`;
-            document.getElementById('optionC').innerText = `C: ${questionData.option_C}`;
-            document.getElementById('optionD').innerText = `D: ${questionData.option_D}`;
-            document.getElementById('progress').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
-        }
 
-        // Function to check the selected answer
-        function checkAnswer(selectedOption) {
-            const correctAnswer = questions[currentQuestionIndex].correct_answer;
-            if (selectedOption === correctAnswer) {
-                correctAnswersCount++;
-            }
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                showQuestion();
-            } else {
-                showResult();
-            }
-        }
+		document.getElementById('start-quiz-button').addEventListener('click', function() {
+            beforeRedirect(); // Execute the function before navigating
+        });
 
-        // Function to show the quiz result and update the chart
-        function showResult() {
-            document.getElementById('quiz-container').style.display = 'none';
-            document.getElementById('result-container').style.display = 'block';
-            document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct!`;
+		document.getElementById('optionA').onclick = () => checkAnswer('A');
+		document.getElementById('optionB').onclick = () => checkAnswer('B');
+		document.getElementById('optionC').onclick = () => checkAnswer('C');
+		document.getElementById('optionD').onclick = () => checkAnswer('D');
+	</script>
 
-            const successRate = (correctAnswersCount / questions.length) * 100;
-            quizAttempts.push(successRate); // Store the percentage of correct answers
-            localStorage.setItem('quizAttempts', JSON.stringify(quizAttempts)); // Save attempts to localStorage
 
-            updateChart(); // Update the line chart to show the evolution
-        }
-
-        // Function to update the line chart
-        function updateChart() {
-            const ctx = document.getElementById('evolutionChart').getContext('2d');
-            const labels = quizAttempts.map((_, index) => `Attempt ${index + 1}`);
-            
-            if (chart) {
-                chart.data.labels = labels;
-                chart.data.datasets[0].data = quizAttempts;
-                chart.update();
-            } else {
-                chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Success Rate (%)',
-                            data: quizAttempts,
-                            borderColor: '#007bff',
-                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                            fill: true,
-                            tension: 0.3,
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100,
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        // Function to clear the historical quiz data from localStorage
-        function clearHistory() {
-            if (confirm("Are you sure you want to clear the historical data?")) {
-                localStorage.removeItem('quizAttempts');
-                quizAttempts = []; // Reset the attempts array
-                updateChart(); // Update the chart to show empty data
-                document.getElementById('result-container').style.display = 'none'; // Hide the result container
-                alert("Historical data cleared!");
-            }
-        }
-
-        // Load the chart with historical data on page load
-        window.onload = function() {
-            if (quizAttempts.length > 0) {
-                updateChart(); // Display historical attempts if available
-                document.getElementById('result-container').style.display = 'block'; // Show the chart on page load
-            }
-        };
-    </script>
 </body>
 </html>
