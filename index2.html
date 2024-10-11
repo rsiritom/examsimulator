@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,6 +67,13 @@
             margin-top: 20px;
             max-width: 100%;
         }
+        /* New button styling for clearing history */
+        button.clear-history {
+            background-color: #dc3545;
+        }
+        button.clear-history:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -98,6 +106,10 @@
             <p class="result" id="result"></p>
             <canvas id="evolutionChart"></canvas>
         </div>
+
+        <!-- New button to clear historical data -->
+        <button class="clear-history" onclick="clearHistory()">Clear Historical Data</button>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -193,6 +205,17 @@
                         }
                     }
                 });
+            }
+        }
+
+        // Function to clear the historical quiz data from localStorage
+        function clearHistory() {
+            if (confirm("Are you sure you want to clear the historical data?")) {
+                localStorage.removeItem('quizAttempts');
+                quizAttempts = []; // Reset the attempts array
+                updateChart(); // Update the chart to show empty data
+                document.getElementById('result-container').style.display = 'none'; // Hide the result container
+                alert("Historical data cleared!");
             }
         }
 
