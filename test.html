@@ -198,7 +198,9 @@
 		let totalPasses = parseInt(localStorage.getItem('totalPasses')) || 0;
 		let goalReached = JSON.parse(localStorage.getItem('goalReached')) || false;
 	
-
+		console.log("threshold es: "+ threshold);
+		console.log("minimumTimes es: "+ minimumTimes);
+		
 		window.onload = function() {
 			console.log("onload en test.html");
 			console.log(threshold);
