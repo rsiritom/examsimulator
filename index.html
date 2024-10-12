@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -162,11 +163,119 @@
             background-color: #dc3545 !important;
             color: white;
         }
+		
+		
+		h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-size: 14px;
+        }
+        select, input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+            color: #333;
+            font-size: 16px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 2.5px; 
+            background: linear-gradient(to right, #007bff 0%, #aab8c8 0%); 
+            border-radius: 5px;
+            outline: none;
+            margin: 10px 0;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px; 
+            height: 30px; 
+            background: #007bff; 
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        input[type="range"]::-webkit-slider-thumb::before {
+            content: '';
+            width: 10px; 
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .goal-display {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #007bff;
+            text-align: center;
+            font-weight: bold;
+            background-color: #f0f8ff;
+            border-radius: 5px;
+            color: #007bff;
+        }
+        .quiz-section {
+            margin-top: 30px;
+            padding: 10px;
+        }
+        .start-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .start-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>PMP Simulator</h1>
+		
+		<h2>Set your new Goal</h2>
+
+		<label for="consecutive-tests">Consecutive Tests (x):</label>
+		<!-- Changed to dropdown -->
+		<select id="consecutive-tests">
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+		</select>
+
+		<label for="percentage">Percentage of Correct Answers (y%):</label>
+		<input type="range" id="percentage" min="10" max="95" value="75">
+		<span id="percentage-value">75%</span>
+
+		<div class="goal-display" id="goal-display">
+			Goal: Complete 1 consecutive test with more than 75% correct answers.
+		</div>
+
+		<div class="quiz-section">
+			<label for="number-of-questions">Number of Questions:</label>
+			<input type="range" id="number-of-questions" min="5" max="180" value="10">
+			<span id="number-of-questions-value">10</span>
+			<button class="start-button" id="start-quiz">Start Quiz</button>
+		</div>
+		
+		
         <center>
             <div id="goal-container">
                 <label for="threshold">Threshold:</label>
@@ -265,6 +374,13 @@
 		let consecutiveSuccessfulQuizzes = parseInt(localStorage.getItem('consecutiveSuccessfulQuizzes')) || 0;
 		let totalPasses = parseInt(localStorage.getItem('totalPasses')) || 0;
 		let goalReached = JSON.parse(localStorage.getItem('goalReached')) || false;
+		
+		const consecutiveInput = document.getElementById('consecutive-tests');
+		const percentageInput = document.getElementById('percentage');
+		const percentageValue = document.getElementById('percentage-value');
+		const goalDisplay = document.getElementById('goal-display');
+		const questionsInput = document.getElementById('number-of-questions');
+		const questionsValue = document.getElementById('number-of-questions-value');
 
 		window.onload = function() {
 			const savedQuestionCount = localStorage.getItem('questionCount');
@@ -282,12 +398,21 @@
 			}
 
 			if (savedQuestionCount) {
-				document.getElementById('question-count').value = savedQuestionCount;
+				//document.getElementById('question-count').value = savedQuestionCount;
+				document.getElementById('number-of-questions').value = savedQuestionCount;  
+				questionsValue.textContent = savedQuestionCount;
 			}
 			
 			if (threshold && minimumTimes) {
-				document.getElementById('threshold').value = threshold;
-				document.getElementById('minimum_times').value = minimumTimes;
+				//document.getElementById('threshold').value = threshold;
+				//document.getElementById('minimum_times').value = minimumTimes;
+				console.log("Threshold es: "+ threshold);
+				console.log("minimumTimes es: "+ minimumTimes);
+				document.getElementById('percentage').value = threshold;
+				percentageValue.textContent = threshold;
+				updateSliderBackground(document.getElementById('percentage'));
+				document.getElementById('consecutive-tests').value = minimumTimes;
+				goalDisplay.textContent = `Goal: Complete ${minimumTimes} consecutive test(s) with more than ${threshold}% correct answers.`;
 				updateProgressBar(totalPasses, minimumTimes);
 			}
 
@@ -316,11 +441,28 @@
 		};
 
 
+		function setgoal() {
+		//threshold = parseInt(document.getElementById('threshold').value);
+			threshold = percentageInput.value;
+			console.log(percentageInput.value);
+			//minimumTimes = parseInt(document.getElementById('minimum_times').value);
+			minimumTimes = consecutiveInput.value;
+			console.log(consecutiveInput.value);		
+			localStorage.setItem('threshold', threshold);
+			localStorage.setItem('minimumTimes', minimumTimes);
+			resetCounters(); 
+			document.getElementById('setquiz-container').style.display = 'inline-block';
+			document.getElementById('start-quiz-button').style.display = 'inline-block';        
+		};
 
 
 		document.getElementById('set-goal-button').onclick = function() {
-			threshold = parseInt(document.getElementById('threshold').value);
-			minimumTimes = parseInt(document.getElementById('minimum_times').value);
+			//threshold = parseInt(document.getElementById('threshold').value);
+			threshold = percentageInput.value;
+			console.log(percentageInput.value);
+			//minimumTimes = parseInt(document.getElementById('minimum_times').value);
+			minimumTimes = consecutiveInput.value;
+			console.log(consecutiveInput.value);		
 			localStorage.setItem('threshold', threshold);
 			localStorage.setItem('minimumTimes', minimumTimes);
 			resetCounters(); 
@@ -331,7 +473,7 @@
 	
 		function resumeQuiz() {
 			document.getElementById('quiz-container').style.display = 'block';
-			showQuestion();
+			//showQuestion();
 		}
 
 
@@ -443,7 +585,7 @@
             console.log("Executing function before redirecting...");
             // Perform any required actions here, like saving data or displaying a message
             //localStorage.setItem('threshold', 70); // Example action
-			const questionCount = document.getElementById('question-count').value;
+		    const questionCount = document.getElementById('number-of-questions').value;
 			localStorage.setItem('questionCount', questionCount);
 
             // Once the function completes, redirect to the other page
@@ -459,6 +601,54 @@
 		document.getElementById('optionB').onclick = () => checkAnswer('B');
 		document.getElementById('optionC').onclick = () => checkAnswer('C');
 		document.getElementById('optionD').onclick = () => checkAnswer('D');
+		
+	    function updateGoal() {
+			const consecutiveTests = consecutiveInput.value;
+			const correctPercentage = percentageInput.value;
+			goalDisplay.textContent = `Goal: Complete ${consecutiveTests} consecutive test(s) with more than ${correctPercentage}% correct answers.`;
+			
+			//new
+	
+		}
+
+		function updateSliderBackground(slider) {
+			const value = slider.value;
+			const min = slider.min;
+			const max = slider.max;
+			const percentage = ((value - min) / (max - min)) * 100;
+			slider.style.background = `linear-gradient(to right, #007bff ${percentage}%, #aab8c8 ${percentage}%)`;
+		}
+
+		//consecutiveInput.addEventListener('change', updateGoal);
+		consecutiveInput.addEventListener('change', function() {
+			updateGoal();
+			setgoal();			
+		});
+		
+		percentageInput.addEventListener('input', function() {
+			percentageValue.textContent = `${percentageInput.value}%`;
+			updateGoal();
+			setgoal();
+			updateSliderBackground(percentageInput);
+		});
+
+		questionsInput.addEventListener('input', function() {
+			questionsValue.textContent = questionsInput.value;
+			updateSliderBackground(questionsInput);			
+		});
+
+		// Initial updates
+		updateGoal();
+		updateSliderBackground(percentageInput);
+		updateSliderBackground(questionsInput);
+
+		// Start Quiz button
+		const startButton = document.getElementById('start-quiz');
+		startButton.addEventListener('click', function() {
+			const numQuestions = questionsInput.value;
+			alert(`Starting quiz with ${numQuestions} questions!`);
+		});
+
 	</script>
 
 
