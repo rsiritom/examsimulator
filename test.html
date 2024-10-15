@@ -270,7 +270,8 @@
 			});
 
 			// Optionally, push a state to ensure popstate is fired when Back is pressed
-			//window.history.pushState({}, '');			
+			//window.history.pushState({}, '');
+
 		};
 
 
@@ -441,7 +442,14 @@
 
 			document.getElementById('setquiz-container').style.display = 'inline-block'; // Show goal settings after quiz ends
 			document.getElementById('start-quiz-button').style.display = 'inline-block'; // Show start quiz button after quiz ends
-			window.location.href = "index.html";
+			
+			
+			if (goalReached) {
+				window.location.href = "congrats.html"; // Redirect to congrats page
+			} else {
+				window.location.href = "index.html"; // Redirect to index.html page
+			}
+	
 		}
 
 		function resetCounters() {
