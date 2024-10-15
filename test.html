@@ -216,6 +216,7 @@
 			
 			if (!quizStarted) {
 				console.log("entro-en-ifn-not-quizstarted");
+				clearButtonStyles();				
 				startQuiz();
 				// Set the flag indicating the quiz has started
 				localStorage.setItem('quizStarted', 'true');
@@ -260,6 +261,16 @@
 					document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct.`; // Show 
 				}
 			}
+			// Add event listener for "Back" button press
+			window.addEventListener('popstate', function(event) {
+				localStorage.removeItem('quizStarted');
+				console.log("Back button pressed");
+				localStorage.removeItem(`selectedOption_${currentQuestionIndex - 1}`);
+				endQuiz();  // Call your endQuiz() function
+			});
+
+			// Optionally, push a state to ensure popstate is fired when Back is pressed
+			//window.history.pushState({}, '');
 		};
 
 
