@@ -271,6 +271,7 @@
 
 			// Optionally, push a state to ensure popstate is fired when Back is pressed
 			//window.history.pushState({}, '');
+			window.history.replaceState({}, document.title);
 		};
 
 
