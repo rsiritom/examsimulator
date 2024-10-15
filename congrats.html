@@ -33,7 +33,7 @@
             padding: 40px;
             border-radius: 10px; /* Rounded corners */
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Shadow effect */
-            animation: scaleIn 0.5s ease-in-out; /* Scale-in effect */
+            animation: scaleIn 0.5s ease-in-out; /* Scale-in effect for overlay */
         }
         @keyframes scaleIn {
             from {
@@ -43,6 +43,22 @@
             to {
                 transform: scale(1);
                 opacity: 1;
+            }
+        }
+        .trophy-emoji {
+            font-size: 100px; /* Adjust size for visibility */
+            margin: 20px 0;
+            opacity: 0; /* Start hidden */
+            animation: trophyAppear 1s forwards; /* Trigger trophy appear animation */
+        }
+        @keyframes trophyAppear {
+            from {
+                transform: scale(0); /* Start from nothing */
+                opacity: 0; /* Start hidden */
+            }
+            to {
+                transform: scale(1); /* End at original size */
+                opacity: 1; /* Fully visible */
             }
         }
         .close-button {
@@ -84,8 +100,9 @@
 <body>
     <div class="overlay" id="overlay">
         <h1>You Did It!</h1>
-        <p>Congratulations on completing your goal!</p>
-        <button class="close-button" onclick="closeOverlay()">Back to home</button>
+        <p>Congratulations on completing the quiz!</p>
+        <div class="trophy-emoji">🏆</div> <!-- Trophy emoji -->
+        <button class="close-button" onclick="closeOverlay()">Back to Menu</button>
     </div>
     <div class="confetti" id="confetti"></div>
 
