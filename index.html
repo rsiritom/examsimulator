@@ -14,10 +14,24 @@
         }
 		.button-container {
 			display: flex;
-			justify-content: center;
-			margin-top: 20px; /* Optional: Add some space above */
-			gap: 20px; /* Add gap between buttons */
+			justify-content: space-between; /* Distribute items between both ends */
+			align-items: center;
+			margin-top: 20px;
+			gap: 20px; /* Adds space between the buttons and the star container */
+			width: 100%;
 		}
+		
+		.range-container {
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            align-items: flex-start; /* Align items to the start */
+            gap: 10px; /* Space between elements */
+        }
+        .range-controls {
+            display: flex;
+            align-items: center; /* Align label and value horizontally */
+            gap: 10px; /* Space between label and value */
+        }
 		
 		button {
             margin-top: 10px;
@@ -115,12 +129,22 @@
             margin-top: 20px;
             max-width: 100%;
         }
-        button.clear-history {
+		button.clear-history {
+            margin-top: 20px;
+            padding: 10px 20px;
+			margin: 0;
+			flex-shrink: 0;
+            border: none;
+            border-radius: 5px;
             background-color: #dc3545;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
         button.clear-history:hover {
-            background-color: #c82333;
-        }
+            background-color: #813545;
+        }      
         #goal-container {
             margin-bottom: 20px;
         }
@@ -227,11 +251,13 @@
             color: #007bff;
         }
         .quiz-section {
-            margin-top: 30px;
+            margin-top: 10px;
             padding: 10px;
         }
         .start-button {
             margin-top: 20px;
+			flex-shrink: 0; 
+			margin: 0;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
@@ -244,13 +270,32 @@
         .start-button:hover {
             background-color: #0056b3;
         }
+		
+		.star-container {
+			margin-left: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            margin-bottom: 20px;
+			align-items: center;
+        }
+
+        .star {
+            color: #e0e0e0; /* Unfilled star color */
+            transition: color 0.3s ease;
+        }
+
+        .filled {
+            color: #ffc107; /* Filled star color */
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>PMP Simulator</h1>
 		
-		<h2>Set your new Goal</h2>
+		<h2>Set your Goal for the next test(s)</h2>
 
 		<label for="consecutive-tests">Consecutive Tests (x):</label>
 		<!-- Changed to dropdown -->
@@ -260,78 +305,42 @@
 			<option value="3">3</option>
 		</select>
 
-		<label for="percentage">Percentage of Correct Answers (y%):</label>
-		<input type="range" id="percentage" min="10" max="95" value="75">
-		<span id="percentage-value">75%</span>
+		
+		<div class="range-container">
+			<div class="range-controls">
+				<label for="percentage">Percentage of Correct Answers (y%):</label>
+				<span id="percentage-value">75%</span>
+			</div>
+			<input type="range" id="percentage" min="10" max="95" value="75">
+		</div>
 
 		<div class="goal-display" id="goal-display">
 			Goal: Complete 1 consecutive test with more than 75% correct answers.
 		</div>
-
-		<div class="quiz-section">
-			<label for="number-of-questions">Number of Questions:</label>
+		
+		<div class="range-container">
+			<div class="range-controls">
+				<label for="number-of-questions">Number of Questions:</label>
+				<span id="number-of-questions-value">10</span>
+			</div>
 			<input type="range" id="number-of-questions" min="5" max="180" value="10">
-			<span id="number-of-questions-value">10</span>
-			<button class="start-button" id="start-quiz">Start Quiz</button>
+		</div>
+
+		<div class="quiz-section">	
+			<div class="button-container">
+				<button class="start-button" id="start-quiz">Start Quiz</button>
+				<button id="clear-history-button" class="clear-history" onclick="clearHistory()">Clear Data</button>
+				<div class="star-container">
+					<span class="star">★</span>
+				</div>
+			</div>
 		</div>
 		
 		
-        <center>
-            <div id="goal-container">
-                <label for="threshold">Threshold:</label>
-                <select id="threshold">
-                    <option value="10">10%</option>
-                    <option value="20">20%</option>
-                    <option value="30">30%</option>
-                    <option value="40">40%</option>
-                    <option value="50">50%</option>
-                    <option value="60">60%</option>
-                    <option value="70">70%</option>
-                    <option value="80">80%</option>
-                    <option value="90">90%</option>
-                    <option value="95">95%</option>
-                </select>
+        
+        <center>       
+			<div class="progress-container">
 
-                <label for="minimum_times">Times:</label>
-                <select id="minimum_times">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                </select>
-                
-                <button id="set-goal-button">Set Goal</button>
-                
-            </div>
-        </center>
-        <center>
-            <div id="setquiz-container" style="display:none; margin-bottom: 20px;">
-                <select id="question-count">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="150">150</option>
-                    <option value="180">180</option>
-                </select>
-
-                <label for="questions_number">Questions:</label>           
-                <button id="start-quiz-button" style="display:none;">Start Quiz</button>
-                <button id="clear-history-button" class="clear-history" onclick="clearHistory()">Clear Data</button>
-                <div id="setquiz-message"></div>
-            </div>
-			<div id="goal-message-container-div" class="goal-message-container">
-				<div id="goal-message"></div>
-			</div>
-			<div id="progress-bar-container-div" class="progress-bar-container">
-				<div id="goal-progress-bar" class="progress-bar"></div>
 			</div>
         </center>
         
@@ -381,6 +390,8 @@
 		const goalDisplay = document.getElementById('goal-display');
 		const questionsInput = document.getElementById('number-of-questions');
 		const questionsValue = document.getElementById('number-of-questions-value');
+		let currentStep = 1;
+		let totalSteps = 1;
 
 		window.onload = function() {
 			const savedQuestionCount = localStorage.getItem('questionCount');
@@ -388,13 +399,21 @@
 			document.getElementById('explanation-container').style.display = 'none';
 
 			// Initially hide the progress bar container
-			document.getElementById('progress-bar-container-div').style.display = 'none';
+			//document.getElementById('progress-bar-container-div').style.display = 'none';
+
+			// Check if 'quizStarted' is stored in localStorage before removing it
+			if (localStorage.getItem('quizStarted') !== null) {
+				localStorage.removeItem('quizStarted');
+				console.log("'quizStarted' removed from localStorage");
+				localStorage.removeItem(`selectedOption_${currentQuestionIndex}`);
+			}
+
 
 			// Check if there are any previously set thresholds and minimum times
 			if (threshold && minimumTimes) {
 				updateProgressBar(totalPasses, minimumTimes);
-				// Show the progress bar if necessary
-				document.getElementById('progress-bar-container-div').style.display = 'block'; 
+				setStars(totalPasses, minimumTimes);
+				//document.getElementById('progress-bar-container-div').style.display = 'block'; 
 			}
 
 			if (savedQuestionCount) {
@@ -414,13 +433,13 @@
 				document.getElementById('consecutive-tests').value = minimumTimes;
 				goalDisplay.textContent = `Goal: Complete ${minimumTimes} consecutive test(s) with more than ${threshold}% correct answers.`;
 				updateProgressBar(totalPasses, minimumTimes);
+				setStars(totalPasses, minimumTimes);
 			}
 
 			// Show goal container and message if the quiz has ended
-			if (goalReached || questions.length === 0) {
-				document.getElementById('goal-container').style.display = 'block';
-				document.getElementById('goal-message-container-div').style.display = 'block';
-				document.getElementById('progress-bar-container-div').style.display = 'block';
+			if (goalReached || questions.length === 0) {				
+				//document.getElementById('goal-message-container-div').style.display = 'block';
+				//document.getElementById('progress-bar-container-div').style.display = 'block';
 			}
 
 			// Resume the quiz if it's still ongoing
@@ -428,8 +447,8 @@
 				resumeQuiz(); // Resume quiz if there are remaining questions
 			} else {
 				// Show goal settings and start quiz button if no quiz is ongoing
-				document.getElementById('setquiz-container').style.display = 'inline-block';
-				document.getElementById('start-quiz-button').style.display = 'inline-block';
+				//document.getElementById('setquiz-container').style.display = 'inline-block';
+				//document.getElementById('start-quiz-button').style.display = 'inline-block';
 
 				// Show chart only if no quiz is in progress
 				if (quizAttempts.length > 0) {
@@ -451,23 +470,8 @@
 			localStorage.setItem('threshold', threshold);
 			localStorage.setItem('minimumTimes', minimumTimes);
 			resetCounters(); 
-			document.getElementById('setquiz-container').style.display = 'inline-block';
-			document.getElementById('start-quiz-button').style.display = 'inline-block';        
-		};
-
-
-		document.getElementById('set-goal-button').onclick = function() {
-			//threshold = parseInt(document.getElementById('threshold').value);
-			threshold = percentageInput.value;
-			console.log(percentageInput.value);
-			//minimumTimes = parseInt(document.getElementById('minimum_times').value);
-			minimumTimes = consecutiveInput.value;
-			console.log(consecutiveInput.value);		
-			localStorage.setItem('threshold', threshold);
-			localStorage.setItem('minimumTimes', minimumTimes);
-			resetCounters(); 
-			document.getElementById('setquiz-container').style.display = 'inline-block';
-			document.getElementById('start-quiz-button').style.display = 'inline-block';        
+			//document.getElementById('setquiz-container').style.display = 'inline-block';
+			//document.getElementById('start-quiz-button').style.display = 'inline-block';        
 		};
 
 	
@@ -486,17 +490,30 @@
 			localStorage.setItem('totalPasses', totalPasses);
 			localStorage.setItem('goalReached', JSON.stringify(goalReached));
 			updateProgressBar(totalPasses, minimumTimes);
-			document.getElementById('goal-message').innerText = "";
+			setStars(totalPasses, minimumTimes);
+			//document.getElementById('goal-message').innerText = "";
 		}
 
 		function updateProgressBar(progress, goal) {
 			if (goal > 0) {
 				const percentage = (progress / goal) * 100; 
-				document.getElementById('goal-progress-bar').style.width = `${percentage}%`; 
-				document.getElementById('goal-message').innerText = `Progress: ${progress} out of ${goal}`;
+				//document.getElementById('goal-progress-bar').style.width = `${percentage}%`; 
+				//document.getElementById('goal-message').innerText = `Progress: ${progress} out of ${goal}`;
 			} else {
-				document.getElementById('goal-progress-bar').style.width = '0%'; 
+				//document.getElementById('goal-progress-bar').style.width = '0%'; 
 			}
+			
+			// progress stars
+			const stars = document.querySelectorAll('.star');
+			stars.forEach((star, index) => {
+			    console.log("index: "+index);
+				console.log("totalprogress: "+ totalPasses);
+				if (index < totalPasses) {
+					star.classList.add('filled');
+				} else {
+					star.classList.remove('filled');
+				}
+        });			
 		}
 
 		function updateChart() {
@@ -546,13 +563,13 @@
 			consecutiveSuccessfulQuizzes = 0;
 			totalPasses = 0;
 			goalReached = false;
-
 			updateProgressBar(totalPasses, minimumTimes);
+			setStars(totalPasses, minimumTimes);
 			updateChart();
 
 			// Show goal settings and start quiz button again
-			document.getElementById('setquiz-container').style.display = 'inline-block';
-			document.getElementById('start-quiz-button').style.display = 'inline-block';
+			//document.getElementById('setquiz-container').style.display = 'inline-block';
+			//document.getElementById('start-quiz-button').style.display = 'inline-block';
 			document.getElementById('clear-history-button').style.display = 'none'; // Hide clear data button after clearing
 		}
 
@@ -593,9 +610,9 @@
         }
 
 
-		document.getElementById('start-quiz-button').addEventListener('click', function() {
-            beforeRedirect(); // Execute the function before navigating
-        });
+		//document.getElementById('start-quiz-button').addEventListener('click', function() {
+        //    beforeRedirect(); // Execute the function before navigating
+        //});
 
 		document.getElementById('optionA').onclick = () => checkAnswer('A');
 		document.getElementById('optionB').onclick = () => checkAnswer('B');
@@ -610,7 +627,7 @@
 			//new
 	
 		}
-
+		
 		function updateSliderBackground(slider) {
 			const value = slider.value;
 			const min = slider.min;
@@ -619,17 +636,58 @@
 			slider.style.background = `linear-gradient(to right, #007bff ${percentage}%, #aab8c8 ${percentage}%)`;
 		}
 
+		function setStars(progress, totalSteps) {
+			const container = document.querySelector('.star-container');
+			const currentStars = container.querySelectorAll('.star').length;
+			
+			// Remove excess stars if necessary
+			if (currentStars > totalSteps) {
+				for (let i = currentStars; i > totalSteps; i--) {
+					container.removeChild(container.lastChild);
+				}
+			}
+
+			// Add missing stars if necessary
+			for (let i = currentStars; i < totalSteps; i++) {
+				const star = document.createElement('span');
+				star.className = 'star';
+				star.innerHTML = '★';
+				container.appendChild(star);
+			}
+
+			// Now fill the stars based on the progress value
+			const stars = container.querySelectorAll('.star');
+			for (let i = 0; i < totalSteps; i++) {
+				if (i < progress) {
+					stars[i].classList.add('filled');  // Apply yellow color to filled stars
+				} else {
+					stars[i].classList.remove('filled');  // Reset unfilled stars to default
+				}
+			}
+		}
+
+		
+		function updatestars(slider) {
+			const value = slider.value;
+			const min = slider.min;
+			const max = slider.max;
+			const percentage = ((value - min) / (max - min)) * 100;
+			slider.style.background = `linear-gradient(to right, #007bff ${percentage}%, #aab8c8 ${percentage}%)`;
+		}
+
 		//consecutiveInput.addEventListener('change', updateGoal);
-		consecutiveInput.addEventListener('change', function() {
+		consecutiveInput.addEventListener('change', function() {	
+			totalSteps = consecutiveInput.value;
 			updateGoal();
 			setgoal();			
+			setStars(totalPasses, minimumTimes);		
 		});
 		
 		percentageInput.addEventListener('input', function() {
 			percentageValue.textContent = `${percentageInput.value}%`;
 			updateGoal();
 			setgoal();
-			updateSliderBackground(percentageInput);
+			updateSliderBackground(percentageInput);			
 		});
 
 		questionsInput.addEventListener('input', function() {
@@ -646,7 +704,8 @@
 		const startButton = document.getElementById('start-quiz');
 		startButton.addEventListener('click', function() {
 			const numQuestions = questionsInput.value;
-			alert(`Starting quiz with ${numQuestions} questions!`);
+			//alert(`Starting quiz with ${numQuestions} questions!`);
+			beforeRedirect(); 
 		});
 
 	</script>
