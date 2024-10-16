@@ -201,6 +201,7 @@
 		console.log("threshold es: "+ threshold);
 		console.log("minimumTimes es: "+ minimumTimes);
 		console.log("goalreached es: "+ goalReached);
+		console.log("en test.html totalpasses es: "+ totalPasses);
 		
 		window.onload = function() {
 			console.log("onload en test.html");
@@ -424,6 +425,7 @@
 			}
 
 			totalPasses = consecutiveSuccessfulQuizzes;
+			console.log("en test.html totalpasses es: "+ totalPasses);
 			localStorage.setItem('consecutiveSuccessfulQuizzes', consecutiveSuccessfulQuizzes);
 			localStorage.setItem('totalPasses', totalPasses);
 
@@ -446,8 +448,8 @@
 			
 			
 			if (goalReached) {
-				goalReached = false;
-				localStorage.setItem('goalReached', JSON.stringify(goalReached));
+				//goalReached = false;
+				//localStorage.setItem('goalReached', JSON.stringify(goalReached));
 				window.location.href = "congrats.html"; // Redirect to congrats page
 			} else {
 				window.location.href = "index.html"; // Redirect to index.html page
