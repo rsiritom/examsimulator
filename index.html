@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMP Simulator</title>
+    <title>Simulator for PMP® Certification</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -345,25 +345,8 @@
 			<div class="progress-container">
 
 			</div>
-        </center>
+        </center>       
         
-        <div id="quiz-container">
-            <div id="question-container" class="question"></div>
-            <div class="options">
-                <button id="optionA" onclick="checkAnswer('A')"></button>
-                <button id="optionB" onclick="checkAnswer('B')"></button>
-                <button id="optionC" onclick="checkAnswer('C')"></button>
-                <button id="optionD" onclick="checkAnswer('D')"></button>
-            </div>
-            <p id="progress"></p>
-			<div class="button-container">
-				<button id="next-button" style="display:none;" onclick="nextQuestion()">Next</button>
-				<button id="abort-button" onclick="abortQuiz()">Abort</button>
-			</div>
-        </div>
-		<div id="explanation-container">
-			<p><strong>Explanation:</strong> <span id="explanation-text"></span></p>
-		</div>
 
         <div id="result-container">
             <p class="result" id="result"></p>
@@ -399,7 +382,7 @@
 		window.onload = function() {
 			const savedQuestionCount = localStorage.getItem('questionCount');
 						
-			document.getElementById('explanation-container').style.display = 'none';
+			//document.getElementById('explanation-container').style.display = 'none';
 
 			// Initially hide the progress bar container
 			//document.getElementById('progress-bar-container-div').style.display = 'none';
@@ -595,7 +578,7 @@
 				}
 				
 				disableOptionButtons(); // Disable the buttons since an option is already selected
-				document.getElementById('next-button').style.display = 'inline-block'; // Show the "Next" button
+				//document.getElementById('next-button').style.display = 'inline-block'; // Show the "Next" button
 			} else {
 				enableOptionButtons(); // If no option is selected, enable all buttons
 			}
@@ -607,7 +590,14 @@
             //localStorage.setItem('threshold', 70); // Example action
 		    const questionCount = document.getElementById('number-of-questions').value;
 			localStorage.setItem('questionCount', questionCount);
-
+			if(goalReached){
+				goalReached = false; 
+				localStorage.setItem('goalReached', JSON.stringify(goalReached));
+				totalPasses = 0;
+				localStorage.setItem('totalPasses', totalPasses);
+				consecutiveSuccessfulQuizzes = 0; 
+				localStorage.setItem('consecutiveSuccessfulQuizzes', consecutiveSuccessfulQuizzes);
+			}
             // Once the function completes, redirect to the other page
             window.location.href = 'test.html';
         }
@@ -617,10 +607,10 @@
         //    beforeRedirect(); // Execute the function before navigating
         //});
 
-		document.getElementById('optionA').onclick = () => checkAnswer('A');
-		document.getElementById('optionB').onclick = () => checkAnswer('B');
-		document.getElementById('optionC').onclick = () => checkAnswer('C');
-		document.getElementById('optionD').onclick = () => checkAnswer('D');
+		//document.getElementById('optionA').onclick = () => checkAnswer('A');
+		//document.getElementById('optionB').onclick = () => checkAnswer('B');
+		//document.getElementById('optionC').onclick = () => checkAnswer('C');
+		//document.getElementById('optionD').onclick = () => checkAnswer('D');
 		
 	    function updateGoal() {
 			const consecutiveTests = consecutiveInput.value;
