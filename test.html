@@ -200,6 +200,7 @@
 	
 		console.log("threshold es: "+ threshold);
 		console.log("minimumTimes es: "+ minimumTimes);
+		console.log("goalreached es: "+ goalReached);
 		
 		window.onload = function() {
 			console.log("onload en test.html");
@@ -445,6 +446,8 @@
 			
 			
 			if (goalReached) {
+				goalReached = false;
+				localStorage.setItem('goalReached', JSON.stringify(goalReached));
 				window.location.href = "congrats.html"; // Redirect to congrats page
 			} else {
 				window.location.href = "index.html"; // Redirect to index.html page
