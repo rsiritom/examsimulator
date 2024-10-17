@@ -296,6 +296,7 @@
 				.then(response => response.json())
 				.then(data => {
 					questions = data;
+					//console.log("questions from backend: "+JSON.stringify(questions, null, 2));
 					currentQuestionIndex = 0;
 					correctAnswersCount = 0;
 					document.getElementById('quiz-container').style.display = 'block';
@@ -360,6 +361,7 @@
 
 			// Save the selected option in localStorage
 			localStorage.setItem(`selectedOption_${currentQuestionIndex}`, selectedOption);
+			console.log(questions);
 			console.log("selectedOption es: "+selectedOption);
 			console.log("selectedButton es: "+selectedButton);
 			console.log("correctAnswer es: "+correctAnswer);
@@ -456,7 +458,7 @@
 				//localStorage.setItem('goalReached', JSON.stringify(goalReached));
 				window.location.href = "congrats.html"; // Redirect to congrats page
 			} else {
-				window.location.href = "index.html"; // Redirect to index.html page
+				window.location.href = "main_pmp.html"; // Redirect to main_pmp.html page
 			}
 	
 		}
