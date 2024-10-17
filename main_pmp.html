@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulator for PMP® Certification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+		.button-container {
+			display: flex;
+			justify-content: space-between; /* Distribute items between both ends */
+			align-items: center;
+			margin-top: 20px;
+			gap: 20px; /* Adds space between the buttons and the star container */
+			width: 100%;
+		}
+		
+		.range-container {
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            align-items: flex-start; /* Align items to the start */
+            gap: 10px; /* Space between elements */
+        }
+        .range-controls {
+            display: flex;
+            align-items: center; /* Align label and value horizontally */
+            gap: 10px; /* Space between label and value */
+        }
+		
+		button {
+            margin-top: 10px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #f2f2f2;
+           	color: #000000;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+			font-family: 'Montserrat', sans-serif;
+			font-style: italic; 
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #b3b3b3;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .question {
+			font-size: 18px;
+            margin-bottom: 20px;
+			text-align: center; 
+        }
+        .options {
+            font-size: 12px;
+			margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+		
+ 
+        .result {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+        }
+        #quiz-container {
+            display: none;
+        }
+		
+		#next-button {
+			margin-right: 20px; /* Add space to the right of the "Next" button */
+		}
+
+		#abort-button {
+			margin-left: 20px; /* Add space to the left of the "Abort" button */
+		}
+
+		#explanation-container {
+			background-color: #f9f9f9; /* Light background color for contrast */
+			border: 1px solid #ddd; /* Light border */
+			padding: 15px; /* Padding inside the container */
+			border-radius: 5px; /* Rounded corners */
+			margin: 20px 0; /* Margin above and below the container */
+			font-family: 'Poppins', sans-serif; /* Font family */
+			font-style: italic; 
+		}
+		
+		#explanation-container p {
+            font-size: 16px; 
+            color: #333; 
+        }
+
+        #explanation-container strong {
+            color: #000; 
+        }
+
+        #explanation-container #explanation-text {
+            color: #555; 
+            font-style: italic; 
+        }
+
+        #result-container {
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+        #progress {
+            text-align: center;
+        }
+        canvas {
+            margin-top: 20px;
+            max-width: 100%;
+        }
+		button.clear-history {
+            margin-top: 20px;
+            padding: 10px 20px;
+			margin: 0;
+			flex-shrink: 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #dc3545;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button.clear-history:hover {
+            background-color: #813545;
+        }      
+        #goal-container {
+            margin-bottom: 20px;
+        }
+		
+		#abort-button {
+			background-color: #dc3545; /* Red color */
+		}
+
+		#abort-button:hover {
+			background-color: #c82333; /* Darker red on hover */
+		}
+
+        #goal-message {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .progress-bar-container {
+			width: 100%;
+			background-color: #e0e0e0;
+			border-radius: 10px;
+			height: 20px;
+			overflow: hidden;
+		}
+        .progress-bar {
+			height: 100%;
+			background-color: #28a745; /* Green color */
+			width: 0; /* Starts from 0% width */
+			transition: width 0.3s ease;
+			border-top-left-radius: 10px; /* Rounded left side */
+			border-bottom-left-radius: 10px;
+			border-top-right-radius: 0; /* Flat right side */
+			border-bottom-right-radius: 0;
+		}
+        .correct-answer {
+            background-color: #28a745 !important;
+            color: white;
+        }
+        .incorrect-answer {
+            background-color: #dc3545 !important;
+            color: white;
+        }
+		
+		
+		h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-size: 14px;
+        }
+        select, input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+            color: #333;
+            font-size: 16px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 2.5px; 
+            background: linear-gradient(to right, #007bff 0%, #aab8c8 0%); 
+            border-radius: 5px;
+            outline: none;
+            margin: 10px 0;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px; 
+            height: 30px; 
+            background: #007bff; 
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        input[type="range"]::-webkit-slider-thumb::before {
+            content: '';
+            width: 10px; 
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .goal-display {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #007bff;
+            text-align: center;
+            font-weight: bold;
+            background-color: #f0f8ff;
+            border-radius: 5px;
+            color: #007bff;
+        }
+        .quiz-section {
+            margin-top: 10px;
+            padding: 10px;
+        }
+        .start-button {
+            margin-top: 20px;
+			flex-shrink: 0; 
+			margin: 0;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .start-button:hover {
+            background-color: #0056b3;
+        }
+		
+		.star-container {
+			margin-left: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            margin-bottom: 20px;
+			align-items: center;
+        }
+
+        .star {
+            color: #e0e0e0; /* Unfilled star color */
+            transition: color 0.3s ease;
+        }
+
+        .filled {
+            color: #ffc107; /* Filled star color */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simulator for PMP® Certification</h1>
+		
+		<h2>Set your Goal for the next test(s)</h2>
+
+		<label for="consecutive-tests">Consecutive Tests (x):</label>
+		<!-- Changed to dropdown -->
+		<select id="consecutive-tests">
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+		</select>
+
+		
+		<div class="range-container">
+			<div class="range-controls">
+				<label for="percentage">Percentage of Correct Answers (y%):</label>
+				<span id="percentage-value">75%</span>
+			</div>
+			<input type="range" id="percentage" min="10" max="95" value="75">
+		</div>
+
+		<div class="goal-display" id="goal-display">
+			Goal: Complete 1 consecutive test with more than 75% correct answers.
+		</div>
+		
+		<div class="range-container">
+			<div class="range-controls">
+				<label for="number-of-questions">Number of Questions:</label>
+				<span id="number-of-questions-value">10</span>
+			</div>
+			<input type="range" id="number-of-questions" min="5" max="180" value="10">
+		</div>
+
+		<div class="quiz-section">	
+			<div class="button-container">
+				<button class="start-button" id="start-quiz">Start Quiz</button>
+				<button id="clear-history-button" class="clear-history" onclick="clearHistory()">Clear Data</button>
+				<div class="star-container">
+					<span class="star">★</span>
+				</div>
+			</div>
+		</div>
+		
+		
+        
+        <center>       
+			<div class="progress-container">
+
+			</div>
+        </center>       
+        
+
+        <div id="result-container">
+            <p class="result" id="result"></p>
+            <canvas id="evolutionChart"></canvas>
+        </div>
+
+
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		let currentQuestionIndex = parseInt(localStorage.getItem('currentQuestionIndex')) || 0;
+		let correctAnswersCount = parseInt(localStorage.getItem('correctAnswersCount')) || 0;
+		let questions = JSON.parse(localStorage.getItem('questions')) || [];
+		let quizAttempts = JSON.parse(localStorage.getItem('quizAttempts')) || [];
+		let chart; 
+		let threshold = parseInt(localStorage.getItem('threshold')) || 0; 
+		let minimumTimes = parseInt(localStorage.getItem('minimumTimes')) || 0; 
+		let consecutiveSuccessfulQuizzes = parseInt(localStorage.getItem('consecutiveSuccessfulQuizzes')) || 0;
+		let totalPasses = parseInt(localStorage.getItem('totalPasses')) || 0;
+		let goalReached = JSON.parse(localStorage.getItem('goalReached')) || false;
+		
+		const consecutiveInput = document.getElementById('consecutive-tests');
+		const percentageInput = document.getElementById('percentage');
+		const percentageValue = document.getElementById('percentage-value');
+		const goalDisplay = document.getElementById('goal-display');
+		const questionsInput = document.getElementById('number-of-questions');
+		const questionsValue = document.getElementById('number-of-questions-value');
+		let currentStep = 1;
+		let totalSteps = 1;
+
+		window.onload = function() {
+			const savedQuestionCount = localStorage.getItem('questionCount');
+						
+			//document.getElementById('explanation-container').style.display = 'none';
+
+			// Initially hide the progress bar container
+			//document.getElementById('progress-bar-container-div').style.display = 'none';
+
+			// Check if 'quizStarted' is stored in localStorage before removing it
+			if (localStorage.getItem('quizStarted') !== null) {
+				localStorage.removeItem('quizStarted');
+				console.log("'quizStarted' removed from localStorage");
+				localStorage.removeItem(`selectedOption_${currentQuestionIndex}`);
+			}
+
+
+			// Check if there are any previously set thresholds and minimum times
+			if (threshold && minimumTimes) {
+				updateProgressBar(totalPasses, minimumTimes);
+				setStars(totalPasses, minimumTimes);
+				//document.getElementById('progress-bar-container-div').style.display = 'block'; 
+			}
+
+			if (savedQuestionCount) {
+				//document.getElementById('question-count').value = savedQuestionCount;
+				document.getElementById('number-of-questions').value = savedQuestionCount;  
+				questionsValue.textContent = savedQuestionCount;
+			}
+			
+			if (threshold && minimumTimes) {
+				//document.getElementById('threshold').value = threshold;
+				//document.getElementById('minimum_times').value = minimumTimes;
+				console.log("Threshold es: "+ threshold);
+				console.log("minimumTimes es: "+ minimumTimes);
+				document.getElementById('percentage').value = threshold;
+				percentageValue.textContent = threshold;
+				updateSliderBackground(document.getElementById('percentage'));
+				document.getElementById('consecutive-tests').value = minimumTimes;
+				goalDisplay.textContent = `Goal: Complete ${minimumTimes} consecutive test(s) with more than ${threshold}% correct answers.`;
+				updateProgressBar(totalPasses, minimumTimes);
+				setStars(totalPasses, minimumTimes);
+			}
+
+			// Show goal container and message if the quiz has ended
+			if (goalReached || questions.length === 0) {				
+				//document.getElementById('goal-message-container-div').style.display = 'block';
+				//document.getElementById('progress-bar-container-div').style.display = 'block';
+			}
+
+			// Resume the quiz if it's still ongoing
+			if (questions.length > 0 && currentQuestionIndex < questions.length) {
+				resumeQuiz(); // Resume quiz if there are remaining questions
+			} else {
+				// Show goal settings and start quiz button if no quiz is ongoing
+				//document.getElementById('setquiz-container').style.display = 'inline-block';
+				//document.getElementById('start-quiz-button').style.display = 'inline-block';
+
+				// Show chart only if no quiz is in progress
+				if (quizAttempts.length > 0) {
+					updateChart(); // Update the chart if there is quiz data
+					document.getElementById('result-container').style.display = 'block'; // Show the result container with the chart
+					document.getElementById('result').innerText = `You got ${correctAnswersCount} out of ${questions.length} correct.`; // Show 
+				}
+			}
+		};
+
+
+		function setgoal() {
+		//threshold = parseInt(document.getElementById('threshold').value);
+			threshold = percentageInput.value;
+			console.log(percentageInput.value);
+			//minimumTimes = parseInt(document.getElementById('minimum_times').value);
+			minimumTimes = consecutiveInput.value;
+			console.log(consecutiveInput.value);		
+			localStorage.setItem('threshold', threshold);
+			localStorage.setItem('minimumTimes', minimumTimes);
+			resetCounters(); 
+			//document.getElementById('setquiz-container').style.display = 'inline-block';
+			//document.getElementById('start-quiz-button').style.display = 'inline-block';        
+		};
+
+	
+		function resumeQuiz() {
+			document.getElementById('quiz-container').style.display = 'block';
+			//showQuestion();
+		}
+
+
+	
+		function resetCounters() {
+			consecutiveSuccessfulQuizzes = 0; 
+			totalPasses = 0;
+			goalReached = false; 
+			localStorage.setItem('consecutiveSuccessfulQuizzes', consecutiveSuccessfulQuizzes);
+			localStorage.setItem('totalPasses', totalPasses);
+			localStorage.setItem('goalReached', JSON.stringify(goalReached));
+			updateProgressBar(totalPasses, minimumTimes);
+			setStars(totalPasses, minimumTimes);
+			//document.getElementById('goal-message').innerText = "";
+		}
+
+		function updateProgressBar(progress, goal) {
+			if (goal > 0) {
+				const percentage = (progress / goal) * 100; 
+				//document.getElementById('goal-progress-bar').style.width = `${percentage}%`; 
+				//document.getElementById('goal-message').innerText = `Progress: ${progress} out of ${goal}`;
+			} else {
+				//document.getElementById('goal-progress-bar').style.width = '0%'; 
+			}
+			
+			// progress stars
+			const stars = document.querySelectorAll('.star');
+			stars.forEach((star, index) => {
+			    console.log("index: "+index);
+				console.log("totalprogress: "+ totalPasses);
+				if (index < totalPasses) {
+					star.classList.add('filled');
+				} else {
+					star.classList.remove('filled');
+				}
+        });			
+		}
+
+		function updateChart() {
+			const ctx = document.getElementById('evolutionChart').getContext('2d');
+			if (chart) chart.destroy();
+			chart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: quizAttempts.map((_, index) => `Attempt ${index + 1}`),
+					datasets: [{
+						label: 'Success Rate (%)',
+                        data: quizAttempts,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+					}]
+				},
+				options: {
+					scales: {
+						y: {
+							beginAtZero: true,
+							max: 100
+						}
+					}
+				}
+			});
+		}
+		
+		
+
+
+		function clearHistory() {
+			localStorage.removeItem('quizAttempts');
+			localStorage.removeItem('threshold');
+			localStorage.removeItem('minimumTimes');
+			localStorage.removeItem('consecutiveSuccessfulQuizzes');
+			localStorage.removeItem('totalPasses');
+			localStorage.removeItem('goalReached');
+			localStorage.removeItem('questions');
+			localStorage.removeItem('currentQuestionIndex');
+			localStorage.removeItem('correctAnswersCount');
+
+			quizAttempts = [];
+			threshold = 0;
+			minimumTimes = 0;
+			consecutiveSuccessfulQuizzes = 0;
+			totalPasses = 0;
+			goalReached = false;
+			updateProgressBar(totalPasses, minimumTimes);
+			setStars(totalPasses, minimumTimes);
+			updateChart();
+
+			// Show goal settings and start quiz button again
+			//document.getElementById('setquiz-container').style.display = 'inline-block';
+			//document.getElementById('start-quiz-button').style.display = 'inline-block';
+			document.getElementById('clear-history-button').style.display = 'none'; // Hide clear data button after clearing
+		}
+
+		function restoreAnswerSelection() {
+			const savedOption = localStorage.getItem(`selectedOption_${currentQuestionIndex}`);
+			const correctAnswer = questions[currentQuestionIndex].correct_answer;
+
+			// Clear previous styles
+			clearButtonStyles();
+
+			if (savedOption) {
+				const selectedButton = document.getElementById(`option${savedOption}`);
+				
+				if (savedOption === correctAnswer) {
+					selectedButton.classList.add('correct-answer'); // Indicate the selected option as correct
+				} else {
+					selectedButton.classList.add('incorrect-answer'); // Indicate the selected option as incorrect
+					const correctButton = document.getElementById(`option${correctAnswer}`);
+					correctButton.classList.add('correct-answer'); // Show the correct answer
+				}
+				
+				disableOptionButtons(); // Disable the buttons since an option is already selected
+				//document.getElementById('next-button').style.display = 'inline-block'; // Show the "Next" button
+			} else {
+				enableOptionButtons(); // If no option is selected, enable all buttons
+			}
+		}
+		
+		function beforeRedirect() {
+            console.log("Executing function before redirecting...");
+            // Perform any required actions here, like saving data or displaying a message
+            //localStorage.setItem('threshold', 70); // Example action
+		    const questionCount = document.getElementById('number-of-questions').value;
+			localStorage.setItem('questionCount', questionCount);
+			if(goalReached){
+				goalReached = false; 
+				localStorage.setItem('goalReached', JSON.stringify(goalReached));
+				totalPasses = 0;
+				localStorage.setItem('totalPasses', totalPasses);
+				consecutiveSuccessfulQuizzes = 0; 
+				localStorage.setItem('consecutiveSuccessfulQuizzes', consecutiveSuccessfulQuizzes);
+			}
+            // Once the function completes, redirect to the other page
+            window.location.href = 'test.html';
+        }
+
+
+		//document.getElementById('start-quiz-button').addEventListener('click', function() {
+        //    beforeRedirect(); // Execute the function before navigating
+        //});
+
+		//document.getElementById('optionA').onclick = () => checkAnswer('A');
+		//document.getElementById('optionB').onclick = () => checkAnswer('B');
+		//document.getElementById('optionC').onclick = () => checkAnswer('C');
+		//document.getElementById('optionD').onclick = () => checkAnswer('D');
+		
+	    function updateGoal() {
+			const consecutiveTests = consecutiveInput.value;
+			const correctPercentage = percentageInput.value;
+			goalDisplay.textContent = `Goal: Complete ${consecutiveTests} consecutive test(s) with more than ${correctPercentage}% correct answers.`;
+			
+			//new
+	
+		}
+		
+		function updateSliderBackground(slider) {
+			const value = slider.value;
+			const min = slider.min;
+			const max = slider.max;
+			const percentage = ((value - min) / (max - min)) * 100;
+			slider.style.background = `linear-gradient(to right, #007bff ${percentage}%, #aab8c8 ${percentage}%)`;
+		}
+
+		function setStars(progress, totalSteps) {
+			const container = document.querySelector('.star-container');
+			const currentStars = container.querySelectorAll('.star').length;
+			
+			// Remove excess stars if necessary
+			if (currentStars > totalSteps) {
+				for (let i = currentStars; i > totalSteps; i--) {
+					container.removeChild(container.lastChild);
+				}
+			}
+
+			// Add missing stars if necessary
+			for (let i = currentStars; i < totalSteps; i++) {
+				const star = document.createElement('span');
+				star.className = 'star';
+				star.innerHTML = '★';
+				container.appendChild(star);
+			}
+
+			// Now fill the stars based on the progress value
+			const stars = container.querySelectorAll('.star');
+			for (let i = 0; i < totalSteps; i++) {
+				if (i < progress) {
+					stars[i].classList.add('filled');  // Apply yellow color to filled stars
+				} else {
+					stars[i].classList.remove('filled');  // Reset unfilled stars to default
+				}
+			}
+		}
+
+		
+		function updatestars(slider) {
+			const value = slider.value;
+			const min = slider.min;
+			const max = slider.max;
+			const percentage = ((value - min) / (max - min)) * 100;
+			slider.style.background = `linear-gradient(to right, #007bff ${percentage}%, #aab8c8 ${percentage}%)`;
+		}
+
+		//consecutiveInput.addEventListener('change', updateGoal);
+		consecutiveInput.addEventListener('change', function() {	
+			totalSteps = consecutiveInput.value;
+			updateGoal();
+			setgoal();			
+			setStars(totalPasses, minimumTimes);		
+		});
+		
+		percentageInput.addEventListener('input', function() {
+			percentageValue.textContent = `${percentageInput.value}%`;
+			updateGoal();
+			setgoal();
+			updateSliderBackground(percentageInput);			
+		});
+
+		questionsInput.addEventListener('input', function() {
+			questionsValue.textContent = questionsInput.value;
+			updateSliderBackground(questionsInput);			
+		});
+
+		// Initial updates
+		updateGoal();
+		updateSliderBackground(percentageInput);
+		updateSliderBackground(questionsInput);
+
+		// Start Quiz button
+		const startButton = document.getElementById('start-quiz');
+		startButton.addEventListener('click', function() {
+			const numQuestions = questionsInput.value;
+			//alert(`Starting quiz with ${numQuestions} questions!`);
+			beforeRedirect(); 
+		});
+
+	</script>
+
+
+</body>
+</html>
