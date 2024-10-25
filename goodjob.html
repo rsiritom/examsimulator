@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good jon!</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            background-color: #ffffff; /* White background */
+            overflow: hidden; /* Prevent scrolling */
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
+            color: #333; /* Dark text color for contrast */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            text-align: center;
+            padding: 40px;
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Shadow effect */
+            animation: scaleIn 0.5s ease-in-out; /* Scale-in effect for overlay */
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .progress-emoji {
+            font-size: 100px; /* Adjust size for visibility */
+            margin: 20px 0;
+            opacity: 0; /* Start hidden */
+            animation: progressAppear 1s forwards; /* Trigger emoji appear animation */
+        }
+        @keyframes progressAppear {
+            from {
+                transform: scale(0); /* Start from nothing */
+                opacity: 0; /* Start hidden */
+            }
+            to {
+                transform: scale(1); /* End at original size */
+                opacity: 1; /* Fully visible */
+            }
+        }
+        .close-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ffc107; /* Yellow button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .close-button:hover {
+            background-color: #e0a800; /* Darker yellow on hover */
+        }
+        .confetti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allow clicks through confetti */
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0.8;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay">
+        <h1>Good Job!</h1>
+        <p>You're near from achieving your goal!</p>
+        <div class="progress-emoji">🚀</div> <!-- Rocket emoji -->
+        <button class="close-button" onclick="closeOverlay()">Back to Menu</button>
+    </div>
+    <div class="confetti" id="confetti"></div>
+
+    <script>
+        function closeOverlay() {
+            window.location.href = 'main_pmp.html'; // Redirect to the main menu
+        }
+
+        // Generate confetti
+        function createConfetti() {
+            const confettiContainer = document.getElementById('confetti');
+            for (let i = 0; i < 100; i++) {
+                const confettiPiece = document.createElement('div');
+                confettiPiece.classList.add('confetti-piece');
+                confettiPiece.style.backgroundColor = getRandomColor();
+                confettiPiece.style.left = Math.random() * 100 + 'vw';
+                confettiPiece.style.animationDuration = Math.random() * 2 + 3 + 's';
+                confettiPiece.style.opacity = Math.random() * 0.8 + 0.2; // Adjust opacity for better visibility
+                confettiContainer.appendChild(confettiPiece);
+                setTimeout(() => {
+                    confettiPiece.remove();
+                }, 5000); // Remove after 5 seconds
+            }
+        }
+
+        function getRandomColor() {
+            const colors = ['#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#8E44AD', '#E67E22', '#FF1493', '#00BFFF'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Start confetti animation
+        createConfetti();
+    </script>
+</body>
+</html>
