@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Try Again!</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            background-color: #ffffff; /* White background */
+            overflow: hidden; /* Prevent scrolling */
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
+            color: #333; /* Dark text color for contrast */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            text-align: center;
+            padding: 40px;
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Shadow effect */
+            animation: scaleIn 0.5s ease-in-out; /* Scale-in effect for overlay */
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .sad-emoji {
+            font-size: 100px; /* Adjust size for visibility */
+            margin: 20px 0;
+            opacity: 0; /* Start hidden */
+            animation: sadAppear 1s forwards; /* Trigger sad emoji appear animation */
+        }
+        @keyframes sadAppear {
+            from {
+                transform: scale(0); /* Start from nothing */
+                opacity: 0; /* Start hidden */
+            }
+            to {
+                transform: scale(1); /* End at original size */
+                opacity: 1; /* Fully visible */
+            }
+        }
+        .retry-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #dc3545; /* Red button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .retry-button:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay">
+        <h1>Try Again!</h1>
+        <p>It looks like you didn't complete the goal. Don't give up!</p>
+        <div class="sad-emoji">😢</div> <!-- Sad emoji -->
+        <button class="retry-button" onclick="retry()">Start Over</button>
+    </div>
+
+    <script>
+        function retry() {
+            window.location.href = 'main_pmp.html'; // Redirect to the main menu or restart
+        }
+    </script>
+</body>
+</html>
