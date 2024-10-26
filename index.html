@@ -10,34 +10,33 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             background-color: #000080;
             color: white;
             font-family: 'Playful', sans-serif;
             overflow: hidden;
         }
         .splash-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             text-align: center;
             animation: fadeIn 1s ease-in-out;
         }
         .splash-title {
             font-size: 5em;
-            animation: grow 1s forwards 2s; /* Start growing at 2 seconds */
+            animation: grow 3s forwards;
         }
         .loader {
+            position: absolute;
+            bottom: 20px;
+            left: calc(50% - 30px); /* Half of the loader's width */
             border: 8px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top: 8px solid white;
             width: 60px;
             height: 60px;
             animation: spin 1s linear infinite;
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -45,12 +44,8 @@
         }
         @keyframes grow {
             0% { font-size: 5em; }
-            10% { font-size: 10em; } /* 100% increase */
-            20% { font-size: 12.5em; } /* 150% increase */
-            30% { font-size: 15em; } /* 200% increase */
-            40% { font-size: 17.5em; } /* 250% increase */
-            50% { font-size: 20em; } /* 300% increase */
-            100% { font-size: 20em; } /* Hold final size */
+            80% { font-size: 8em; }
+            100% { font-size: 5em; }
         }
         @keyframes fadeIn {
             0% { opacity: 0; }
